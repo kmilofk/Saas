@@ -1,0 +1,244 @@
+/* Responsive Styles */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .config-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .venta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .venta-productos {
+        border-right: none;
+        padding-right: 0;
+        border-bottom: 1px solid var(--gray-200);
+        padding-bottom: var(--spacing-xl);
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .venta-resumen {
+        padding-left: 0;
+    }
+
+    /* Stats grid en tablet - 2 columnas */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-width);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .sidebar-toggle {
+        display: block;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .sidebar.collapsed~.main-content {
+        margin-left: 0;
+    }
+
+    .header {
+        padding: 0 var(--spacing-md);
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .header-title {
+        font-size: var(--font-size-lg);
+    }
+
+    .date-display {
+        display: none;
+    }
+
+    .content-wrapper {
+        padding: var(--spacing-md);
+    }
+
+    /* Stats grid en mobile - 1 columna (dashboard.css tiene estilos específicos) */
+
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .section-actions,
+    .section-filters {
+        justify-content: stretch;
+    }
+
+    .section-actions .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .search-input {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    .table-responsive {
+        font-size: var(--font-size-sm);
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: var(--spacing-sm);
+    }
+
+    .empleados-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        margin: var(--spacing-md);
+        max-height: calc(100vh - var(--spacing-xl));
+    }
+
+    .modal-body {
+        padding: var(--spacing-md);
+    }
+
+    .toast-container {
+        left: var(--spacing-md);
+        right: var(--spacing-md);
+        top: auto;
+        bottom: var(--spacing-md);
+    }
+
+    .toast {
+        min-width: auto;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .header-actions {
+        gap: 0;
+    }
+
+    .header-btn {
+        padding: var(--spacing-xs);
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+    }
+
+    .logo span {
+        display: none;
+    }
+
+    .header-title {
+        font-size: var(--font-size-base);
+    }
+
+    /* Stats grid en mobile small - dashboard.css tiene estilos específicos */
+
+    .modal-content {
+        width: 100%;
+        max-width: none;
+        border-radius: var(--radius-md);
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .config-card {
+        border-radius: var(--radius-md);
+    }
+}
+
+/* Print Styles */
+@media print {
+
+    .sidebar,
+    .header,
+    .section-actions,
+    .section-filters,
+    .table-actions,
+    .modal,
+    .toast-container {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .content-wrapper {
+        padding: 0;
+    }
+
+    .card,
+    .stat-card,
+    .table-responsive {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #006400;
+        --primary-hover: #004d00;
+        --gray-200: #999;
+        --gray-300: #777;
+    }
+
+    .btn {
+        border: 2px solid currentColor;
+    }
+
+    .form-input {
+        border-width: 2px;
+    }
+}

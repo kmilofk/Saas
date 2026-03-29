@@ -1,0 +1,341 @@
+/* Modules Styles */
+
+/* Config Grid */
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.config-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+.config-card .card-header {
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.config-card .card-body {
+    padding: var(--spacing-lg);
+}
+
+.config-form {
+    max-width: 400px;
+}
+
+.config-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.config-option:last-child {
+    border-bottom: none;
+}
+
+.config-option label:first-child {
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.config-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.about-info p {
+    margin-bottom: var(--spacing-sm);
+    color: var(--gray-600);
+}
+
+/* Empleados Cards */
+.empleados-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.empleado-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    padding: var(--spacing-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all var(--transition-base);
+}
+
+.empleado-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.empleado-card-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-md);
+}
+
+.empleado-card-name {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: var(--spacing-xs);
+}
+
+.empleado-card-cargo {
+    color: var(--primary-color);
+    font-weight: 500;
+    margin-bottom: var(--spacing-md);
+}
+
+.empleado-card-info {
+    width: 100%;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--gray-200);
+}
+
+.empleado-card-row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-sm) 0;
+    font-size: var(--font-size-sm);
+}
+
+.empleado-card-row span:first-child {
+    color: var(--gray-500);
+}
+
+.empleado-card-row span:last-child {
+    color: var(--gray-700);
+    font-weight: 500;
+}
+
+.empleado-card-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    width: 100%;
+}
+
+.empleado-card-actions .btn {
+    flex: 1;
+    justify-content: center;
+}
+
+/* Venta Form Grid */
+.venta-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-xl);
+}
+
+.venta-productos {
+    border-right: 1px solid var(--gray-200);
+    padding-right: var(--spacing-xl);
+}
+
+.venta-resumen {
+    padding-left: var(--spacing-md);
+}
+
+.venta-resumen h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: var(--spacing-lg);
+}
+
+.resumen-line {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-sm) 0;
+    font-size: var(--font-size-sm);
+}
+
+.resumen-line.total {
+    border-top: 2px solid var(--gray-200);
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+    color: var(--primary-color);
+}
+
+.venta-items {
+    margin-top: var(--spacing-lg);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.venta-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+.venta-item-info {
+    flex: 1;
+}
+
+.venta-item-name {
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+}
+
+.venta-item-details {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+}
+
+.venta-item-remove {
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    font-size: var(--font-size-base);
+}
+
+/* Action Buttons in Tables */
+.table-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.table-actions .btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+}
+
+/* Stock Indicator */
+.stock-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.stock-bar {
+    width: 100px;
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.stock-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width var(--transition-base);
+}
+
+.stock-fill.high {
+    background: var(--success-color);
+}
+
+.stock-fill.medium {
+    background: var(--warning-color);
+}
+
+.stock-fill.low {
+    background: var(--danger-color);
+}
+
+/* Category Badge */
+.category-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.category-badge.alimentos {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.category-badge.bebidas {
+    background: #e3f2fd;
+    color: #0277bd;
+}
+
+.category-badge.postres {
+    background: #fce4ec;
+    color: #c2185b;
+}
+
+.category-badge.insumos {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.category-badge.proveedores {
+    background: #fff8e1;
+    color: #f57f17;
+}
+
+.category-badge.servicios {
+    background: #f3e5f5;
+    color: #6a1b9a;
+}
+
+.category-badge.mantenimiento {
+    background: #eceff1;
+    color: #455a64;
+}
+
+.category-badge.personal {
+    background: #e0f7fa;
+    color: #006064;
+}
+
+.category-badge.otros {
+    background: #fafafa;
+    color: #616161;
+}
+
+/* Payment Method Badge */
+.payment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.payment-badge i {
+    font-size: var(--font-size-sm);
+}
+
+.payment-badge.efectivo {
+    color: #2e7d32;
+}
+
+.payment-badge.tarjeta {
+    color: #1565c0;
+}
+
+.payment-badge.transferencia {
+    color: #6a1b9a;
+}

@@ -1,0 +1,225 @@
+/* ============================================
+   GUÍA DE REFERENCIA RÁPIDA - DASHBOARD CSS
+   ============================================ */
+
+/* 📊 GRID SYSTEM
+   ──────────────────────────────────────────── */
+.stats-grid {
+    display: grid;
+    gap: 1.25rem;
+    /* Escritorio: 4 columnas */
+    /* Tablet: 2 columnas */
+    /* Móvil: 1 columna */
+}
+
+.dashboard-grid {
+    display: grid;
+    gap: 1.5rem;
+    /* Escritorio: 2 columnas */
+    /* Tablet/Móvil: 1 columna */
+}
+
+
+/* 🎨 COLORES PRINCIPALES
+   ──────────────────────────────────────────── */
+/* Positivo (Verde) */
+--success: #059669;
+--success-bg: rgba(5, 150, 105, 0.1);
+
+/* Negativo (Rojo) */
+--danger: #dc2626;
+--danger-bg: rgba(220, 38, 38, 0.1);
+
+/* Advertencia (Naranja) */
+--warning: #d97706;
+--warning-bg: rgba(217, 119, 6, 0.1);
+
+/* Texto Principal */
+--text-primary: #1f2937;
+--text-secondary: #6b7280;
+--text-tertiary: #9ca3af;
+
+
+/* 📏 TAMAÑOS DE FUENTE
+   ──────────────────────────────────────────── */
+.stat-label:     0.75rem  (12px)
+stat-pedidos:    0.8rem   (12.8px)
+trend-badge:     0.7rem   (11.2px)
+stat-value:      1.875rem (30px) ← PRINCIPAL
+card-title:      0.9375rem (15px)
+
+
+/* 🎭 SOMBRAS (SHADOWS)
+   ──────────────────────────────────────────── */
+/* Card Normal */
+box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.04);
+
+/* Card Hover */
+box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+
+/* Icono */
+box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+
+
+/* 📐 BORDER RADIUS
+   ──────────────────────────────────────────── */
+Cards:          16px
+Iconos:         14px
+Alertas:        12px
+Badges:         20px (pill shape)
+Avatares:       50% (círculo perfecto)
+
+
+/* 🎬 TRANSICIONES
+   ──────────────────────────────────────────── */
+/* Estándar */
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+/* Hover rápido */
+transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+/* Animaciones de entrada */
+animation: cardSlideIn 0.5s ease-out backwards;
+
+
+/* 📱 BREAKPOINTS
+   ──────────────────────────────────────────── */
+Escritorio:  > 1024px   (4 columnas stats)
+Tablet:      768-1024px (2 columnas stats)
+Móvil:       < 768px    (1 columna stats)
+Móvil Small: < 480px    (Vertical centrado)
+
+
+/* 🔧 UTILIDADES DE TEXTO
+   ──────────────────────────────────────────── */
+/* Para truncar texto */
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+
+/* Para títulos */
+letter-spacing: -0.25px;  /* Más compacto */
+font-weight: 600-700;
+
+/* Para labels */
+text-transform: uppercase;
+letter-spacing: 0.5-0.75px;
+
+
+/* 🎯 EFECTOS HOVER
+   ──────────────────────────────────────────── */
+/* Card hover */
+transform: translateY(-4px);
+
+/* Icono hover */
+transform: scale(1.08);
+
+/* Resumen item hover */
+transform: translateX(4px);
+
+
+/* 📊 ALTURAS FIJAS
+   ──────────────────────────────────────────── */
+.stat-card:    min-height: 140px
+.chart-container: height: 280px
+.alerts-list:  max-height: 340px (scrollable)
+
+
+/* 🎨 GRADIENTES
+   ──────────────────────────────────────────── */
+/* Card background */
+background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
+
+/* Icono verde */
+background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+
+/* Icono rojo */
+background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+
+/* Icono azul */
+background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+
+/* Icono naranja */
+background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+
+/* Header card */
+background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+
+
+/* ⚡ ANIMACIONES KEYFRAMES
+   ──────────────────────────────────────────── */
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes alertSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+/* 🎨 CLASES DE UTILIDAD
+   ──────────────────────────────────────────── */
+/* Positive (Verde) */
+.positive { color: #059669; }
+.bg-success-light { background: rgba(5, 150, 105, 0.1); }
+
+/* Negative (Rojo) */
+.negative { color: #dc2626; }
+.bg-danger-light { background: rgba(220, 38, 38, 0.1); }
+
+/* Warning (Naranja) */
+.warning { color: #d97706; }
+.bg-warning-light { background: rgba(217, 119, 6, 0.1); }
+
+
+/* 📦 PADDING/SPACING
+   ──────────────────────────────────────────── */
+Card:         1.5rem  (24px)
+Card Header:  1.25rem 1.5rem
+Alert Item:   1rem
+Resumen Item: 1.125rem
+
+
+/* 🎯 FLEXBOX PATTERNS
+   ──────────────────────────────────────────── */
+/* Icon + Text */
+display: flex;
+align-items: flex-start;
+gap: 1rem;
+
+/* Centrado perfecto */
+display: flex;
+align-items: center;
+justify-content: center;
+
+/* Texto a la izquierda, badge a la derecha */
+display: flex;
+justify-content: space-between;
+align-items: center;
+
+
+/* 📝 NOTAS IMPORTANTES
+   ──────────────────────────────────────────── */
+1. Siempre usar min-width: 0 en flex children con texto truncado
+2. Los gradientes van de 135deg para iconos
+3. Las sombras son multi-capa para profundidad
+4. Los delays de animación son escalonados (0.05s)
+5. Hover effects son sutiles, no exagerados

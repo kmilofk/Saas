@@ -17,6 +17,9 @@
 
     <!-- Dashboard Styles -->
     <link rel="stylesheet" href="assets/css/dashboard.css">
+
+    <!-- Ventas Module - Modern SaaS Redesign -->
+    <link rel="stylesheet" href="css/ventas.module.css">
 </head>
 
 <body>
@@ -406,7 +409,8 @@
             <!-- Fin Vista: Dashboard -->
 
             <!-- Vista: Ventas -->
-            <div class="view-container view-ventas" data-view="ventas">
+            <div class="view-container view-ventas ventas-module" data-view="ventas">
+                <!-- Module Header -->
                 <div class="module-header">
                     <div class="module-title-section">
                         <h1 class="module-title">
@@ -415,137 +419,232 @@
                         </h1>
                         <p class="module-subtitle">Gestiona y realiza un seguimiento de todas las ventas</p>
                     </div>
-                    <button class="btn btn-primary">
+                    <button class="btn-new-sale">
                         <i class="fas fa-plus"></i>
                         Nueva Venta
                     </button>
                 </div>
 
-                <!-- Filtros -->
-                <div class="module-filters">
-                    <div class="filter-group">
-                        <label class="filter-label">
-                            <i class="fas fa-calendar"></i>
-                            Fecha
-                        </label>
-                        <input type="date" class="filter-input" value="2026-03-28">
-                    </div>
-                    <div class="filter-group owner-only">
-                        <label class="filter-label">
-                            <i class="fas fa-store"></i>
-                            Sucursal
-                        </label>
-                        <select class="filter-select">
-                            <option value="all">Todas las sucursales</option>
-                            <option value="1">Sucursal Centro</option>
-                            <option value="2">Sucursal Norte</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label">
-                            <i class="fas fa-filter"></i>
-                            Estado
-                        </label>
-                        <select class="filter-select">
-                            <option value="all">Todos los estados</option>
-                            <option value="completed">Completado</option>
-                            <option value="pending">Pendiente</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-outline">
+                <!-- Toolbar: Search & Filters -->
+                <div class="ventas-toolbar">
+                    <!-- Search Box with Integrated Icon -->
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Buscar por cliente, ID o producto...">
                         <i class="fas fa-search"></i>
+                    </div>
+
+                    <!-- Filter Segment -->
+                    <div class="filter-segment">
+                        <div class="filter-group-compact">
+                            <label class="filter-label-compact">
+                                <i class="fas fa-calendar"></i>
+                                Fecha
+                            </label>
+                            <select class="filter-select-compact">
+                                <option value="today">Hoy</option>
+                                <option value="yesterday">Ayer</option>
+                                <option value="7days">Últimos 7 días</option>
+                                <option value="30days">Últimos 30 días</option>
+                                <option value="custom">Personalizado</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group-compact">
+                            <label class="filter-label-compact">
+                                <i class="fas fa-credit-card"></i>
+                                Método
+                            </label>
+                            <select class="filter-select-compact">
+                                <option value="all">Todos</option>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="tarjeta">Tarjeta</option>
+                                <option value="transferencia">Transferencia</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group-compact owner-only">
+                            <label class="filter-label-compact">
+                                <i class="fas fa-store"></i>
+                                Sucursal
+                            </label>
+                            <select class="filter-select-compact">
+                                <option value="all">Todas</option>
+                                <option value="1">Centro</option>
+                                <option value="2">Norte</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group-compact">
+                            <label class="filter-label-compact">
+                                <i class="fas fa-filter"></i>
+                                Estado
+                            </label>
+                            <select class="filter-select-compact">
+                                <option value="all">Todos</option>
+                                <option value="pagado">Pagado</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="en-preparacion">En preparación</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn-filter">
+                        <i class="fas fa-filter"></i>
                         Filtrar
                     </button>
                 </div>
 
-                <!-- Tarjetas de Resumen -->
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-icon kpi-icon-primary">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                        <div class="kpi-content">
-                            <span class="kpi-label">Total Ventas Día</span>
-                            <span class="kpi-value">$1,250,000</span>
-                            <span class="kpi-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                12% vs ayer
-                            </span>
-                        </div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-icon kpi-icon-success">
-                            <i class="fas fa-receipt"></i>
-                        </div>
-                        <div class="kpi-content">
-                            <span class="kpi-label">Transacciones</span>
-                            <span class="kpi-value">48</span>
-                            <span class="kpi-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                8% vs ayer
-                            </span>
-                        </div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-icon kpi-icon-info">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <div class="kpi-content">
-                            <span class="kpi-label">Ticket Promedio</span>
-                            <span class="kpi-value">$26,042</span>
-                            <span class="kpi-change neutral">
-                                <i class="fas fa-minus"></i>
-                                Sin cambios
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabla de Ventas -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
+                <!-- Sales Table -->
+                <div class="ventas-card">
+                    <div class="ventas-card-header">
+                        <h3 class="ventas-card-title">
                             <i class="fas fa-list"></i>
                             Historial de Ventas
                         </h3>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Fecha</th>
-                                        <th>Cliente</th>
-                                        <th>Total</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>#V001</strong></td>
-                                        <td>28/03 10:30</td>
-                                        <td>Juan Pérez</td>
-                                        <td><strong>$45,000</strong></td>
-                                        <td><span class="badge badge-success">Completado</span></td>
-                                        <td>
-                                            <button class="btn-icon"><i class="fas fa-eye"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>#V002</strong></td>
-                                        <td>28/03 11:15</td>
-                                        <td>María García</td>
-                                        <td><strong>$78,500</strong></td>
-                                        <td><span class="badge badge-success">Completado</span></td>
-                                        <td>
-                                            <button class="btn-icon"><i class="fas fa-eye"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="ventas-card-body">
+                        <table class="ventas-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                    <th>Método</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="ventas-id">#V001</span></td>
+                                    <td><span class="ventas-date">28/03 10:30</span></td>
+                                    <td><span class="ventas-cliente">Juan Pérez</span></td>
+                                    <td><span class="ventas-total">$45,000</span></td>
+                                    <td><span class="status-badge pagado">Pagado</span></td>
+                                    <td><span class="ventas-method"><i class="fas fa-money-bill"></i> Efectivo</span>
+                                    </td>
+                                    <td>
+                                        <div class="ventas-actions">
+                                            <button class="btn-icon-ventas" title="Ver detalle"
+                                                onclick="verDetalleVenta('V001')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon-ventas" title="Imprimir"
+                                                onclick="imprimirVenta('V001')">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><span class="ventas-id">#V002</span></td>
+                                    <td><span class="ventas-date">28/03 11:15</span></td>
+                                    <td><span class="ventas-cliente">María García</span></td>
+                                    <td><span class="ventas-total">$78,500</span></td>
+                                    <td><span class="status-badge pagado">Pagado</span></td>
+                                    <td><span class="ventas-method"><i class="fas fa-credit-card"></i> Tarjeta</span>
+                                    </td>
+                                    <td>
+                                        <div class="ventas-actions">
+                                            <button class="btn-icon-ventas" title="Ver detalle"
+                                                onclick="verDetalleVenta('V002')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon-ventas" title="Imprimir"
+                                                onclick="imprimirVenta('V002')">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><span class="ventas-id">#V003</span></td>
+                                    <td><span class="ventas-date">28/03 12:00</span></td>
+                                    <td><span class="ventas-cliente">Carlos López</span></td>
+                                    <td><span class="ventas-total">$32,000</span></td>
+                                    <td><span class="status-badge pendiente">Pendiente</span></td>
+                                    <td><span class="ventas-method"><i class="fas fa-money-bill"></i> Efectivo</span>
+                                    </td>
+                                    <td>
+                                        <div class="ventas-actions">
+                                            <button class="btn-icon-ventas" title="Ver detalle"
+                                                onclick="verDetalleVenta('V003')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon-ventas" title="Imprimir"
+                                                onclick="imprimirVenta('V003')">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><span class="ventas-id">#V004</span></td>
+                                    <td><span class="ventas-date">28/03 12:45</span></td>
+                                    <td><span class="ventas-cliente">Ana Rodríguez</span></td>
+                                    <td><span class="ventas-total">$95,200</span></td>
+                                    <td><span class="status-badge en-preparacion">En preparación</span></td>
+                                    <td><span class="ventas-method"><i class="fas fa-university"></i>
+                                            Transferencia</span></td>
+                                    <td>
+                                        <div class="ventas-actions">
+                                            <button class="btn-icon-ventas" title="Ver detalle"
+                                                onclick="verDetalleVenta('V004')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon-ventas" title="Imprimir"
+                                                onclick="imprimirVenta('V004')">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><span class="ventas-id">#V005</span></td>
+                                    <td><span class="ventas-date">28/03 13:20</span></td>
+                                    <td><span class="ventas-cliente">Roberto Martínez</span></td>
+                                    <td><span class="ventas-total">$67,800</span></td>
+                                    <td><span class="status-badge cancelado">Cancelado</span></td>
+                                    <td><span class="ventas-method"><i class="fas fa-credit-card"></i> Tarjeta</span>
+                                    </td>
+                                    <td>
+                                        <div class="ventas-actions">
+                                            <button class="btn-icon-ventas" title="Ver detalle"
+                                                onclick="verDetalleVenta('V005')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon-ventas" title="Imprimir"
+                                                onclick="imprimirVenta('V005')">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><span class="ventas-id">#V006</span></td>
+                                    <td><span class="ventas-date">28/03 14:05</span></td>
+                                    <td><span class="ventas-cliente">Laura Sánchez</span></td>
+                                    <td><span class="ventas-total">$123,500</span></td>
+                                    <td><span class="status-badge pagado">Pagado</span></td>
+                                    <td><span class="ventas-method"><i class="fas fa-credit-card"></i> Tarjeta</span>
+                                    </td>
+                                    <td>
+                                        <div class="ventas-actions">
+                                            <button class="btn-icon-ventas" title="Ver detalle"
+                                                onclick="verDetalleVenta('V006')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn-icon-ventas" title="Imprimir"
+                                                onclick="imprimirVenta('V006')">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -4605,8 +4704,82 @@
         </div>
     </div>
 
+    <!-- Modal POS - Nueva Venta -->
+    <div class="modal-overlay" id="modal-nueva-venta">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-cash-register"></i>
+                    Nueva Venta
+                </h2>
+                <button class="modal-close" data-modal-close>
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="pos-container">
+                    <!-- Lista de Productos -->
+                    <div class="pos-products">
+                        <div class="pos-search">
+                            <input type="text" id="pos-buscar-producto" class="pos-search-input"
+                                placeholder="Buscar producto...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="pos-products-grid" id="pos-lista-productos">
+                            <!-- Productos se generan dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Carrito / Resumen -->
+                    <div class="pos-cart">
+                        <h3 class="pos-cart-title">
+                            <i class="fas fa-shopping-cart"></i>
+                            Pedido Actual
+                        </h3>
+                        <div class="pos-cart-items" id="pos-carrito-items">
+                            <!-- Items del carrito -->
+                        </div>
+                        <div class="pos-cart-summary">
+                            <div class="pos-summary-row">
+                                <span>Subtotal:</span>
+                                <span id="pos-subtotal">$0</span>
+                            </div>
+                            <div class="pos-summary-row">
+                                <span>Impuestos (19%):</span>
+                                <span id="pos-impuestos">$0</span>
+                            </div>
+                            <div class="pos-summary-row pos-summary-total">
+                                <span>Total:</span>
+                                <span id="pos-total">$0</span>
+                            </div>
+                        </div>
+                        <div class="pos-cart-actions">
+                            <div class="pos-payment-method">
+                                <label class="pos-payment-label">Método de Pago:</label>
+                                <select id="pos-metodo-pago" class="pos-payment-select">
+                                    <option value="efectivo">Efectivo</option>
+                                    <option value="tarjeta">Tarjeta</option>
+                                    <option value="transferencia">Transferencia</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" data-modal-close>Cancelar</button>
+                <button class="btn btn-primary" id="pos-confirmar-venta">
+                    <i class="fas fa-check-circle"></i>
+                    Confirmar Venta
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Dashboard Script -->
     <script src="assets/js/dashboard.js"></script>
+    <!-- Ventas Module Script -->
+    <script src="assets/js/ventas.js"></script>
 </body>
 
 </html>
