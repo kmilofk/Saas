@@ -276,7 +276,7 @@ const UserDropdown = {
         const html = `
         <!-- ══════════ PROFILE MODAL ══════════ -->
         <div id="profile-modal" class="ac-modal-overlay" onclick="UserDropdown._overlayClick(event,'profile-modal')">
-            <div class="ac-modal" role="dialog" aria-modal="true" aria-label="Mi Perfil">
+            <div class="ac-modal ac-modal--wide" role="dialog" aria-modal="true" aria-label="Mi Perfil">
                 <!-- Header -->
                 <div class="ac-modal-header">
                     <div class="ac-modal-header-bg"></div>
@@ -298,21 +298,23 @@ const UserDropdown = {
                     <p class="ac-modal-sub">Actualiza tu información personal</p>
 
                     <form onsubmit="event.preventDefault(); UserDropdown.saveProfile();" class="pm-form">
-                        <div class="pm-field">
-                            <label for="pm-nombre"><i class="fas fa-user"></i> Nombre completo</label>
-                            <input type="text" id="pm-nombre" placeholder="Tu nombre completo" autocomplete="name">
-                        </div>
-                        <div class="pm-field">
-                            <label for="pm-email"><i class="fas fa-envelope"></i> Email</label>
-                            <input type="email" id="pm-email" placeholder="correo@ejemplo.com" autocomplete="email">
-                        </div>
-                        <div class="pm-field">
-                            <label for="pm-celular"><i class="fas fa-phone"></i> Celular</label>
-                            <input type="tel" id="pm-celular" placeholder="3001234567" autocomplete="tel">
-                        </div>
-                        <div class="pm-field">
-                            <label for="pm-password"><i class="fas fa-lock"></i> Nueva contraseña <span class="pm-optional">(opcional)</span></label>
-                            <input type="password" id="pm-password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                        <div class="pm-form-grid-2">
+                            <div class="pm-field">
+                                <label for="pm-nombre"><i class="fas fa-user"></i> Nombre completo</label>
+                                <input type="text" id="pm-nombre" placeholder="Tu nombre completo" autocomplete="name">
+                            </div>
+                            <div class="pm-field">
+                                <label for="pm-email"><i class="fas fa-envelope"></i> Email</label>
+                                <input type="email" id="pm-email" placeholder="correo@ejemplo.com" autocomplete="email">
+                            </div>
+                            <div class="pm-field">
+                                <label for="pm-celular"><i class="fas fa-phone"></i> Celular</label>
+                                <input type="tel" id="pm-celular" placeholder="3001234567" autocomplete="tel">
+                            </div>
+                            <div class="pm-field">
+                                <label for="pm-password"><i class="fas fa-lock"></i> Nueva contraseña <span class="pm-optional">(opcional)</span></label>
+                                <input type="password" id="pm-password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                            </div>
                         </div>
                         <div id="pm-feedback" class="pm-feedback"></div>
                         <button type="submit" class="pm-save-btn">

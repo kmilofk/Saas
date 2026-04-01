@@ -756,6 +756,7 @@
          SCRIPTS
     ══════════════════════════════════════ -->
     <script src="../assets/js/sucursal-core.js"></script>
+    <script src="../assets/js/invoice-modal.js"></script>
     <script>
     /* ================================================================
        POS MODULE — clean, modular, no legacy code
@@ -996,63 +997,47 @@
         /* ── Register sale ── */
         function registrarVenta() {
             if (!cart.length) return;
-            const total = cart.reduce((s, i) => s + i.sub, 0);
-            const pagoLabel = { efectivo: '💵 Efectivo', tarjeta: '💳 Tarjeta', transferencia: '🏦 Transferencia' };
 
-            Swal.fire({
-                title: '¿Confirmar venta?',
-                html: `
-                    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;text-align:left;">
-                        <div style="padding:10px 14px;background:#F8FAFF;border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
-                            <span style="color:#9CA3AF;font-size:.8125rem;">Artículos</span>
-                            <span style="font-weight:700;">${cart.reduce((s,i)=>s+i.qty,0)} unidades</span>
-                        </div>
-                        <div style="padding:10px 14px;background:#F8FAFF;border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
-                            <span style="color:#9CA3AF;font-size:.8125rem;">Método de pago</span>
-                            <span style="font-weight:700;">${pagoLabel[payMethod] || payMethod}</span>
-                        </div>
-                        <div style="padding:14px 16px;background:linear-gradient(135deg,#0B132B,#1C3054);border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
-                            <span style="color:rgba(255,255,255,.5);font-size:.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;">Total</span>
-                            <span style="color:white;font-weight:900;font-size:1.375rem;letter-spacing:-.03em;">${fmt(total)}</span>
-                        </div>
-                    </div>`,
-                showCancelButton: true,
-                confirmButtonText: '<i class="fas fa-check"></i> Confirmar Venta',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#10B981',
-                cancelButtonColor: '#6B7280',
-                reverseButtons: true,
-                width: '400px',
-                customClass: { popup: 'swal-pos' }
-            }).then(r => {
-                if (!r.isConfirmed) return;
+            // Build items payload
+            const items = cart.map(i => ({
+                codigo:   i.codigo,
+                nombre:   i.name,
+                precio:   i.price,
+                cantidad: i.qty,
+                subtotal: i.sub
+            }));
 
-                const result = SucursalData.registrarVenta(sucId, {
-                    cliente: 'Cliente General',
-                    metodoPago: payMethod,
-                    items: cart.map(i => ({ codigo: i.codigo, nombre: i.name, precio: i.price, cantidad: i.qty, subtotal: i.sub }))
-                });
-
-                if (result.ok) {
-                    cart = [];
-                    payMethod = 'efectivo';
-                    document.querySelectorAll('.pay-pill').forEach(p => { p.classList.remove('active'); p.setAttribute('aria-pressed','false'); });
-                    const ef = document.querySelector('.pay-pill[data-value="efectivo"]');
-                    if (ef) { ef.classList.add('active'); ef.setAttribute('aria-pressed','true'); }
-                    _renderCart();
-                    _loadInventory();
-
-                    Swal.fire({
-                        icon: 'success', title: '¡Venta Registrada!',
-                        html: `<p style="color:#4B5563;">ID: <strong>${result.venta.id}</strong></p>
-                               <p style="font-size:1.5rem;font-weight:900;color:#0B132B;margin-top:8px;">${fmt(result.venta.total)}</p>`,
-                        confirmButtonColor: '#0B132B',
-                        timer: 3000, showConfirmButton: false
-                    });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: result.msg, confirmButtonColor: '#0B132B' });
-                }
+            // Register sale immediately — no intermediate confirm dialog
+            const result = SucursalData.registrarVenta(sucId, {
+                cliente:    'Cliente General',
+                metodoPago: payMethod,
+                items
             });
+
+            if (!result.ok) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al registrar',
+                    text: result.msg,
+                    confirmButtonColor: '#0B132B'
+                });
+                return;
+            }
+
+            // Reset cart & payment method
+            cart      = [];
+            payMethod = 'efectivo';
+            document.querySelectorAll('.pay-pill').forEach(p => {
+                p.classList.remove('active');
+                p.setAttribute('aria-pressed', 'false');
+            });
+            const ef = document.querySelector('.pay-pill[data-value="efectivo"]');
+            if (ef) { ef.classList.add('active'); ef.setAttribute('aria-pressed', 'true'); }
+            _renderCart();
+            _loadInventory();
+
+            // Show professional invoice
+            FacturaModal.show(result.venta, session);
         }
 
         /* ── Public API ── */

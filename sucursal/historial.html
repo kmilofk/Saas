@@ -110,8 +110,11 @@
         .badge-warning { background: #FEF3C7; color: #92400E; }
         .badge-danger  { background: #FEE2E2; color: #991B1B; }
 
-        .btn-ver { width: 30px; height: 30px; background: var(--bg); border: 1.5px solid var(--border2); border-radius: var(--r); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text3); font-size: .8125rem; }
+        .btn-ver { width: 30px; height: 30px; background: var(--bg); border: 1.5px solid var(--border2); border-radius: var(--r); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text3); font-size: .8125rem; transition: background .15s, color .15s, border-color .15s; }
         .btn-ver:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-print { width: 30px; height: 30px; background: var(--bg); border: 1.5px solid var(--border2); border-radius: var(--r); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text3); font-size: .8125rem; transition: background .15s, color .15s, border-color .15s; margin-left: 4px; }
+        .btn-print:hover { background: #3B82F6; color: white; border-color: #3B82F6; }
+        .tbl-actions { display: flex; align-items: center; justify-content: flex-end; }
 
         .empty-row td { text-align: center; padding: 48px 16px; color: var(--text3); }
         .empty-row i { font-size: 2rem; display: block; margin-bottom: 10px; opacity: .3; }
@@ -216,7 +219,7 @@
                             <th>Total</th>
                             <th>Pago</th>
                             <th>Estado</th>
-                            <th></th>
+                            <th style="text-align:right;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="ventas-tbody">
@@ -229,6 +232,7 @@
 </div>
 
 <script src="../assets/js/sucursal-core.js"></script>
+<script src="../assets/js/invoice-modal.js"></script>
 <script>
 const Historial = {
     session: null,
@@ -294,7 +298,7 @@ const Historial = {
         count.textContent = `${this.filtered.length} registros`;
 
         if (!this.filtered.length) {
-            tbody.innerHTML = `<tr class="empty-row"><td colspan="8"><i class="fas fa-receipt"></i>Sin ventas registradas en este período</td></tr>`;
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="9"><i class="fas fa-receipt"></i>Sin ventas registradas en este período</td></tr>`;
             return;
         }
 
@@ -305,7 +309,7 @@ const Historial = {
             const prodsShort = prods.length > 40 ? prods.substring(0, 40) + '…' : prods;
             return `
             <tr>
-                <td><strong style="color:var(--text1);font-family:monospace;">${v.id}</strong></td>
+                <td><strong style="color:var(--text1);font-family:monospace;font-size:.75rem;">${v.id}</strong></td>
                 <td>${Utils.fmtDate(v.fecha)}</td>
                 <td>${v.cliente}</td>
                 <td title="${prods}" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${prodsShort}</td>
@@ -313,52 +317,33 @@ const Historial = {
                 <td>${pagoLabel[v.metodoPago] || v.metodoPago}</td>
                 <td><span class="badge badge-success">Completado</span></td>
                 <td>
-                    <button class="btn-ver" onclick="Historial.verDetalle('${v.id}')" title="Ver detalle">
-                        <i class="fas fa-eye"></i>
-                    </button>
+                    <div class="tbl-actions">
+                        <button class="btn-ver" onclick="Historial.verDetalle('${v.id}')" title="Ver detalle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-print" onclick="Historial.reimprimir('${v.id}')" title="Reimprimir factura">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>`;
         }).join('');
     },
 
     verDetalle(id) {
+        // Show full invoice modal for detail view
+        this.reimprimir(id);
+    },
+
+    reimprimir(id) {
         const v = this.ventas.find(x => x.id === id);
-        if (!v) return;
-        const pagoLabel = { efectivo: '💵 Efectivo', tarjeta: '💳 Tarjeta', transferencia: '🏦 Transferencia' };
-        Swal.fire({
-            title: `<span style="font-size:1rem;font-weight:800;">Venta ${v.id}</span>`,
-            html: `
-                <div style="text-align:left;display:flex;flex-direction:column;gap:8px;margin-top:8px;">
-                    <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#F8FAFF;border-radius:10px;">
-                        <span style="color:#8898AA;font-size:.8rem;">Fecha</span>
-                        <span style="font-weight:600;font-size:.875rem;">${Utils.fmtDate(v.fecha)}</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#F8FAFF;border-radius:10px;">
-                        <span style="color:#8898AA;font-size:.8rem;">Cliente</span>
-                        <span style="font-weight:600;font-size:.875rem;">${v.cliente}</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#F8FAFF;border-radius:10px;">
-                        <span style="color:#8898AA;font-size:.8rem;">Método de pago</span>
-                        <span style="font-weight:600;font-size:.875rem;">${pagoLabel[v.metodoPago] || v.metodoPago}</span>
-                    </div>
-                    <div style="padding:10px 14px;background:#F8FAFF;border-radius:10px;">
-                        <div style="color:#8898AA;font-size:.8rem;margin-bottom:6px;">Productos</div>
-                        ${v.items.map(i => `
-                        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #E8EDF5;">
-                            <span style="font-size:.8125rem;font-weight:600;">${i.nombre} <span style="color:#8898AA;">x${i.cantidad}</span></span>
-                            <span style="font-size:.8125rem;font-weight:700;color:#10B981;">${Utils.fmtCurrency(i.subtotal)}</span>
-                        </div>`).join('')}
-                    </div>
-                    <div style="display:flex;justify-content:space-between;padding:12px 16px;background:#0B132B;border-radius:10px;">
-                        <span style="color:rgba(255,255,255,.6);font-weight:700;font-size:.875rem;">TOTAL</span>
-                        <span style="color:white;font-weight:800;font-size:1.125rem;">${Utils.fmtCurrency(v.total)}</span>
-                    </div>
-                </div>
-            `,
-            confirmButtonText: 'Cerrar',
-            confirmButtonColor: '#0B132B',
-            width: '440px'
-        });
+        if (!v) {
+            Swal.fire({ icon: 'error', title: 'Venta no encontrada', text: `No se encontró la venta ${id}`, confirmButtonColor: '#0B132B' });
+            return;
+        }
+        // Reconstruct the session info for the invoice header
+        const session = SucursalAuth.getSession();
+        FacturaModal.show(v, session || {});
     }
 };
 

@@ -94,15 +94,6 @@ function initTabs() {
 
     tabOwner.addEventListener('click', () => activateTab('owner'));
     tabSuc.addEventListener('click', () => activateTab('sucursal'));
-
-    // Check if already has a branch session → auto-switch
-    if (SucursalAuth.isAuthenticated()) {
-        window.location.href = REDIRECT_SUCURSAL;
-    }
-    // Check if already has an admin session → auto-switch
-    if (AuthService.isAuthenticated()) {
-        window.location.href = REDIRECT_OWNER;
-    }
 }
 
 // ── PASSWORD TOGGLE ──────────────────────────────────────────
@@ -172,7 +163,8 @@ async function handleOwnerSubmit(e) {
 
     const usuario = AuthService.login(celular, password);
 
-    if (!usuario || usuario.rol !== 'dueño') {
+    // Accept both 'dueño' and 'administrador' roles for the admin panel
+    if (!usuario || (usuario.rol !== 'dueño' && usuario.rol !== 'administrador')) {
         showMessage('Credenciales incorrectas. Verifica tu celular y contraseña.', 'error');
         document.getElementById('owner-password').classList.add('error');
         btn.disabled = false;
@@ -255,6 +247,17 @@ async function startSuccessAnimation(message, overlayMsg) {
 
 // ── INIT ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if already has a branch session → auto-switch
+    if (SucursalAuth.isAuthenticated()) {
+        window.location.href = REDIRECT_SUCURSAL;
+        return;
+    }
+    // Check if already has an admin session → auto-switch
+    if (AuthService.isAuthenticated()) {
+        window.location.href = REDIRECT_OWNER;
+        return;
+    }
+
     initTabs();
     initPasswordToggles();
     initInputListeners();

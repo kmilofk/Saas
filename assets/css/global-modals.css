@@ -29,6 +29,8 @@
     background: #ffffff;
     border-radius: 20px;
     width: 100%; max-width: 460px;
+    max-height: 85vh;
+    display: flex; flex-direction: column;
     box-shadow: 0 24px 64px rgba(11,19,43,0.24), 0 0 0 1px rgba(255,255,255,0.08);
     overflow: hidden;
     transform: translateY(24px) scale(0.96);
@@ -38,7 +40,7 @@
 .ac-modal-overlay.open .ac-modal {
     transform: translateY(0) scale(1);
 }
-.ac-modal--wide { max-width: 540px; }
+.ac-modal--wide { max-width: 680px; } /* Ampliado para layout de columnas */
 
 /* ══════════════════════════════════════════
    MODAL HEADER (banner gradient)
@@ -46,6 +48,7 @@
 .ac-modal-header {
     position: relative;
     height: 90px;
+    flex-shrink: 0; /* Header fijo */
     background: linear-gradient(135deg, #0B132B 0%, #2C3E66 100%);
     display: flex; align-items: flex-end; justify-content: center;
     overflow: visible;
@@ -102,9 +105,21 @@
 ══════════════════════════════════════════ */
 .ac-modal-body {
     padding: 44px 28px 28px;
+    flex: 1; /* Body flexible */
+    overflow-y: auto; overflow-x: hidden;
 }
 .ac-modal-header--settings + .ac-modal-body { padding-top: 22px; }
 .ac-modal--wide .ac-modal-body { padding-top: 22px; }
+
+/* Grid layout util para forms */
+.pm-form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 20px;
+}
+@media (max-width: 600px) {
+    .pm-form-grid-2 { grid-template-columns: 1fr; }
+}
 
 .pm-role-row { text-align: center; margin-bottom: 6px; }
 .pm-role-badge {
