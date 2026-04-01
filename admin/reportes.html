@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes Globales | Anthony Chef</title>
+    <meta name="description" content="Reportes globales y análisis de rendimiento — Anthony Chef Panel Administrativo">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/global-modals.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #F0F4FF;
+            --bg-card: #FFFFFF;
+            --bg-sidebar: #0B132B;
+            --text-primary: #1A1F36;
+            --text-secondary: #5A6E8A;
+            --text-muted: #8898AA;
+            --primary-dark: #0B132B;
+            --primary-mid: #2C3E66;
+            --primary-light: #3B82F6;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --danger: #EF4444;
+            --danger-light: #FEE2E2;
+            --border-light: #E8EDF5;
+            --border-default: #D1D9E6;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.07);
+            --shadow-xl: 0 20px 35px -10px rgba(0,0,0,0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --sidebar-width: 272px;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            position: fixed; left: 0; top: 0;
+            height: 100vh; overflow-y: auto;
+            display: flex; flex-direction: column;
+            z-index: 1000; box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+        }
+        .sidebar-header { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; }
+        .logo-name { font-size: 1.125rem; font-weight: 800; color: #fff; }
+        .logo-tagline { font-size: 0.6875rem; color: rgba(255,255,255,0.4); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
+        .sidebar-section-label { padding: 20px 24px 8px; font-size: 0.6875rem; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.1em; }
+        .sidebar-nav { flex: 1; padding-bottom: 16px; }
+        .nav-item { display: flex; align-items: center; gap: 13px; padding: 12px 24px; color: rgba(255,255,255,0.55); text-decoration: none; font-size: 0.875rem; font-weight: 500; border-left: 3px solid transparent; transition: all 0.15s; }
+        .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .nav-item.active { background: linear-gradient(90deg, rgba(59,130,246,0.18), rgba(59,130,246,0.05)); color: #fff; border-left-color: #3B82F6; }
+        .nav-item i { width: 20px; text-align: center; font-size: 0.9375rem; }
+        .sidebar-footer { padding: 20px 24px; border-top: 1px solid rgba(255,255,255,0.07); }
+        .sidebar-user { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.06); border-radius: var(--radius-md); margin-bottom: 12px; }
+        .sidebar-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #B8860B, #DAA520); display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 800; color: white; flex-shrink: 0; }
+        .sidebar-user-name { font-size: 0.8125rem; font-weight: 700; color: #fff; display: block; }
+        .sidebar-user-role { font-size: 0.6875rem; color: rgba(255,255,255,0.45); display: block; }
+
+        /* LAYOUT */
+        .app-container { display: flex; min-height: 100vh; }
+        .main-content { margin-left: var(--sidebar-width); flex: 1; min-height: 100vh; }
+
+        /* HEADER */
+        .top-header {
+            background: var(--bg-card); border-bottom: 1px solid var(--border-light);
+            padding: 0 40px; height: 80px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 200; box-shadow: var(--shadow-sm);
+        }
+        .header-left h1 { font-size: 1.375rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
+        .header-left p { font-size: 0.8125rem; color: var(--text-secondary); }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+
+        .btn-export {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border: 1.5px solid var(--border-default);
+            border-radius: var(--radius-md); font-size: 0.8125rem; font-weight: 700;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            background: var(--bg-card); color: var(--text-secondary);
+            transition: all 0.15s;
+        }
+        .btn-export:hover { border-color: var(--primary-light); color: var(--primary-light); background: rgba(59,130,246,0.04); }
+        .btn-export.excel:hover { border-color: var(--success); color: var(--success); background: rgba(16,185,129,0.04); }
+
+        /* USER DROPDOWN */
+        #udrop-container { position: relative; }
+        #udrop-btn { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--bg-card); border: 1.5px solid var(--border-default); border-radius: var(--radius-lg); cursor: pointer; min-width: 220px; transition: all 0.15s; box-shadow: var(--shadow-sm); }
+        #udrop-btn:hover { border-color: var(--primary-light); }
+        .udrop-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #B8860B, #DAA520, #FFD700); display: flex; align-items: center; justify-content: center; font-size: 0.9375rem; font-weight: 800; color: white; flex-shrink: 0; box-shadow: 0 4px 12px rgba(184,134,11,0.35); }
+        .udrop-info { flex: 1; text-align: left; }
+        .udrop-name { font-size: 0.875rem; font-weight: 700; color: var(--text-primary); display: block; white-space: nowrap; }
+        .udrop-role-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; background: linear-gradient(135deg, #FEF3C7, #FDE68A); border-radius: 9999px; font-size: 0.6rem; font-weight: 700; color: #92400E; text-transform: uppercase; margin-top: 2px; }
+        #udrop-arrow { color: var(--text-muted); font-size: 0.75rem; transition: transform 0.2s; }
+        #udrop-menu { position: absolute; top: calc(100% + 10px); right: 0; width: 280px; background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl), 0 0 0 1px var(--border-light); z-index: 9999; display: none; overflow: hidden; animation: dropIn .18s ease; }
+        #udrop-menu.active { display: block; }
+        @keyframes dropIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+        .udrop-menu-header { padding: 18px 20px 14px; background: linear-gradient(135deg, #0B132B, #2C3E66); display: flex; align-items: center; gap: 12px; }
+        .udrop-menu-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #B8860B, #DAA520, #FFD700); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; color: white; box-shadow: 0 4px 12px rgba(184,134,11,0.4); flex-shrink: 0; }
+        .udrop-menu-name { font-size: 0.875rem; font-weight: 700; color: white; display: block; }
+        .udrop-menu-role { font-size: 0.6875rem; color: rgba(255,255,255,0.55); display: block; }
+        .udrop-menu-body { padding: 8px; }
+        .udrop-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; transition: background 0.12s; }
+        .udrop-item:hover { background: var(--bg-main); color: var(--text-primary); }
+        .udrop-item i { width: 18px; color: var(--text-muted); font-size: 0.9375rem; text-align: center; }
+        .udrop-item.danger { color: var(--danger); }
+        .udrop-item.danger i { color: var(--danger); }
+        .udrop-item.danger:hover { background: #FEE2E2; }
+        .udrop-divider { height: 1px; background: var(--border-light); margin: 4px 12px; }
+
+        /* CONTENT */
+        .content { padding: 28px 40px 40px; }
+
+        /* KPI CARDS */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .kpi-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); position: relative; overflow: hidden; }
+        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .kpi-card:nth-child(1)::before { background: linear-gradient(90deg, #10B981, #059669); }
+        .kpi-card:nth-child(2)::before { background: linear-gradient(90deg, #3B82F6, #2D3A6B); }
+        .kpi-card:nth-child(3)::before { background: linear-gradient(90deg, #F59E0B, #D97706); }
+        .kpi-card:nth-child(4)::before { background: linear-gradient(90deg, #8B5CF6, #7C3AED); }
+        .kpi-icon { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.125rem; color: white; margin-bottom: 12px; }
+        .kpi-icon.green   { background: linear-gradient(135deg, #10B981, #059669); }
+        .kpi-icon.blue    { background: linear-gradient(135deg, #3B82F6, #2D3A6B); }
+        .kpi-icon.orange  { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .kpi-icon.purple  { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+        .kpi-value { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; }
+        .kpi-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+        /* FILTERS */
+        .filters-card { background: var(--bg-card); border-radius: var(--radius-xl); border: 1px solid var(--border-light); box-shadow: var(--shadow-md); margin-bottom: 24px; overflow: hidden; }
+        .filters-header { padding: 18px 24px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px; }
+        .filters-header h3 { font-size: 0.9375rem; font-weight: 700; color: var(--text-primary); }
+        .filters-body { padding: 20px 24px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 16px; align-items: end; }
+        .fgroup label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .fgroup input,
+        .fgroup select {
+            width: 100%; padding: 10px 14px;
+            border: 1.5px solid var(--border-default); border-radius: var(--radius-md);
+            font-size: 0.875rem; color: var(--text-primary); background: var(--bg-main);
+            font-family: 'Inter', sans-serif; transition: border-color 0.15s;
+        }
+        .fgroup input:focus,
+        .fgroup select:focus { outline: none; border-color: var(--primary-light); background: var(--bg-card); }
+        .btn-generate {
+            display: inline-flex; align-items: center; gap: 9px;
+            padding: 11px 20px;
+            background: linear-gradient(135deg, #0B132B, #2C3E66);
+            color: white; border: none; border-radius: var(--radius-md);
+            font-size: 0.875rem; font-weight: 700; cursor: pointer;
+            font-family: 'Inter', sans-serif; white-space: nowrap;
+            transition: all 0.15s; box-shadow: 0 4px 12px rgba(11,19,43,0.2);
+        }
+        .btn-generate:hover { background: linear-gradient(135deg, #1A2847, #3B4B8C); transform: translateY(-1px); }
+
+        /* CHART */
+        .chart-card { background: var(--bg-card); border-radius: var(--radius-xl); padding: 24px; box-shadow: var(--shadow-md); border: 1px solid var(--border-light); margin-bottom: 24px; }
+        .chart-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+        .chart-title h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+        .chart-title p { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+        .chart-container { position: relative; height: 280px; }
+
+        /* TABLES */
+        .table-card { background: var(--bg-card); border-radius: var(--radius-xl); border: 1px solid var(--border-light); box-shadow: var(--shadow-md); margin-bottom: 24px; overflow: hidden; }
+        .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px; }
+        .table-header h3 { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+        .table-wrapper { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { padding: 12px 16px; font-size: 0.6875rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; background: #F8FAFF; text-align: left; border-bottom: 1px solid var(--border-light); white-space: nowrap; }
+        .data-table td { padding: 14px 16px; font-size: 0.8125rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-light); white-space: nowrap; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #FAFCFF; }
+        .rank-badge { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; font-size: 0.75rem; font-weight: 800; }
+        .rank-1 { background: #FFD700; color: #7A5500; }
+        .rank-2 { background: #C0C0C0; color: #444; }
+        .rank-3 { background: #CD7F32; color: #fff; }
+        .rank-n { background: var(--bg-main); color: var(--text-muted); }
+
+        .pct-bar-wrap { display: flex; align-items: center; gap: 8px; }
+        .pct-bar-track { flex: 1; height: 6px; background: var(--bg-main); border-radius: 9999px; overflow: hidden; }
+        .pct-bar { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, #2D3A6B, #3B82F6); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .filters-body { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 0; overflow: hidden; }
+            .main-content { margin-left: 0; }
+            .top-header { padding: 0 16px; flex-wrap: wrap; height: auto; padding-top: 16px; padding-bottom: 16px; gap: 12px; }
+            .content { padding: 16px; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .filters-body { grid-template-columns: 1fr; }
+            #udrop-btn { min-width: 0; }
+            .udrop-info { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="../assets/logo.png" alt="Anthony Chef">
+                <div>
+                    <div class="logo-name">Anthony Chef</div>
+                    <div class="logo-tagline">Panel Administrativo</div>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">Principal</div>
+            <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
+            <a href="sucursales.html" class="nav-item"><i class="fas fa-store"></i><span>Sucursales</span></a>
+            <a href="reportes.html" class="nav-item active"><i class="fas fa-chart-bar"></i><span>Reportes</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">AB</div>
+                <div>
+                    <span class="sidebar-user-name">Angelica Buitrago</span>
+                    <span class="sidebar-user-role">Propietaria / CEO</span>
+                </div>
+            </div>
+            <button style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);border-radius:var(--radius-sm);color:#FC8181;font-size:0.8125rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;" onclick="UserDropdown.logout()">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <!-- HEADER -->
+        <header class="top-header">
+            <div class="header-left">
+                <h1>Reportes Globales</h1>
+                <p>Análisis detallado del rendimiento de Anthony Chef</p>
+            </div>
+            <div class="header-right">
+                <button class="btn-export" onclick="Reportes.exportPDF()">
+                    <i class="fas fa-file-pdf" style="color:#EF4444;"></i> Exportar PDF
+                </button>
+                <button class="btn-export excel" onclick="Reportes.exportExcel()">
+                    <i class="fas fa-file-excel" style="color:#10B981;"></i> Exportar Excel
+                </button>
+
+                <!-- USER DROPDOWN -->
+                <div id="udrop-container">
+                    <button id="udrop-btn" onclick="UserDropdown.toggle()">
+                        <div class="udrop-avatar">AB</div>
+                        <div class="udrop-info">
+                            <span class="udrop-name">Angelica Buitrago</span>
+                            <span class="udrop-role-badge">
+                                <i class="fas fa-crown" style="font-size:.55rem;"></i>
+                                Propietaria / CEO
+                            </span>
+                        </div>
+                        <i class="fas fa-chevron-down" id="udrop-arrow"></i>
+                    </button>
+                    <div id="udrop-menu">
+                        <div class="udrop-menu-header">
+                            <div class="udrop-menu-avatar">AB</div>
+                            <div>
+                                <span class="udrop-menu-name">Angelica Buitrago</span>
+                                <span class="udrop-menu-role">Propietaria / CEO · Anthony Chef</span>
+                            </div>
+                        </div>
+                        <div class="udrop-menu-body">
+                            <button class="udrop-item" onclick="UserDropdown.showProfile()"><i class="fas fa-user-circle"></i><span>Mi Perfil</span></button>
+                            <button class="udrop-item" onclick="UserDropdown.showSettings()"><i class="fas fa-cog"></i><span>Configuración</span></button>
+                            <div class="udrop-divider"></div>
+                            <button class="udrop-item danger" onclick="UserDropdown.logout()"><i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT -->
+        <main class="content">
+
+            <!-- KPI SUMMARY -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon green"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="kpi-value" id="rep-ventas">$119,670,000</div>
+                    <div class="kpi-label">Ventas Totales</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon blue"><i class="fas fa-chart-bar"></i></div>
+                    <div class="kpi-value" id="rep-promedio">$39,890,000</div>
+                    <div class="kpi-label">Promedio por Sucursal</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon orange"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="kpi-value" id="rep-pedidos">2,830</div>
+                    <div class="kpi-label">Total Pedidos</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon purple"><i class="fas fa-store"></i></div>
+                    <div class="kpi-value" id="rep-sucursales">3</div>
+                    <div class="kpi-label">Sucursales Activas</div>
+                </div>
+            </div>
+
+            <!-- FILTERS -->
+            <div class="filters-card">
+                <div class="filters-header">
+                    <i class="fas fa-filter" style="color:var(--primary-light);"></i>
+                    <h3>Filtros de Reporte</h3>
+                </div>
+                <div class="filters-body">
+                    <div class="fgroup">
+                        <label for="f-date-start"><i class="fas fa-calendar-alt"></i> Fecha Inicio</label>
+                        <input type="date" id="f-date-start">
+                    </div>
+                    <div class="fgroup">
+                        <label for="f-date-end"><i class="fas fa-calendar-check"></i> Fecha Fin</label>
+                        <input type="date" id="f-date-end">
+                    </div>
+                    <div class="fgroup">
+                        <label for="f-sucursal"><i class="fas fa-store"></i> Sucursal</label>
+                        <select id="f-sucursal" onchange="Reportes.updateChart()">
+                            <option value="all">Todas las Sucursales</option>
+                            <option value="1">Sucursal San Cayetano</option>
+                            <option value="2">Sucursal Universidad Icesi</option>
+                            <option value="3">Fábrica</option>
+                        </select>
+                    </div>
+                    <div class="fgroup">
+                        <label for="f-tipo"><i class="fas fa-tag"></i> Tipo de Reporte</label>
+                        <select id="f-tipo">
+                            <option value="ventas">Ventas</option>
+                            <option value="inventario">Inventario</option>
+                            <option value="usuarios">Usuarios</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button class="btn-generate" onclick="Reportes.generate()">
+                            <i class="fas fa-chart-bar"></i> Generar Reporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHART -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <h3>Ventas por Sucursal</h3>
+                        <p id="chart-subtitle">Resultados de todas las sucursales · Marzo 2026</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-sucursales"></canvas>
+                </div>
+            </div>
+
+            <!-- TABLE: SUCURSALES SUMMARY -->
+            <div class="table-card">
+                <div class="table-header">
+                    <i class="fas fa-store" style="color:var(--primary-light);"></i>
+                    <h3>Resumen por Sucursal</h3>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Sucursal</th>
+                                <th>Ventas</th>
+                                <th>Pedidos</th>
+                                <th>Ticket Promedio</th>
+                                <th>% del Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-sucursales"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TABLE: TOP PRODUCTS -->
+            <div class="table-card">
+                <div class="table-header">
+                    <i class="fas fa-trophy" style="color:#F59E0B;"></i>
+                    <h3>Top 10 Productos Más Vendidos</h3>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Ventas</th>
+                                <th>Ingresos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/ui/user-dropdown.js"></script>
+
+<script>
+const Reportes = {
+    chart: null,
+
+    ALL_BRANCHES: [
+        { id:1, nombre:'Sucursal San Cayetano', ventas:52300000, pedidos:1284, ticket:40730, pct:43.7 },
+        { id:2, nombre:'Sucursal Universidad Icesi', ventas:38450000, pedidos:892, ticket:43120, pct:32.1 },
+        { id:3, nombre:'Fábrica', ventas:28920000, pedidos:654, ticket:44220, pct:24.2 }
+    ],
+
+    PRODUCTS: [
+        { pos:1,  name:'Hamburguesa Clásica',  cat:'Comida Rápida', units:1250, revenue:18750000 },
+        { pos:2,  name:'Pizza Pepperoni',       cat:'Pizzas',        units:980,  revenue:24500000 },
+        { pos:3,  name:'Hot Dog Especial',      cat:'Comida Rápida', units:875,  revenue:8750000  },
+        { pos:4,  name:'Ensalada César',        cat:'Ensaladas',     units:720,  revenue:10800000 },
+        { pos:5,  name:'Gaseosa 1.5L',          cat:'Bebidas',       units:650,  revenue:3250000  },
+        { pos:6,  name:'Jugo Natural',          cat:'Bebidas',       units:580,  revenue:4640000  },
+        { pos:7,  name:'Papas Fritas',          cat:'Complementos',  units:520,  revenue:3120000  },
+        { pos:8,  name:'Aros de Cebolla',       cat:'Complementos',  units:480,  revenue:3360000  },
+        { pos:9,  name:'Helado',                cat:'Postres',       units:420,  revenue:2520000  },
+        { pos:10, name:'Brownie',               cat:'Postres',       units:380,  revenue:2660000  }
+    ],
+
+    fmt(val) { return '$' + val.toLocaleString('es-CO'); },
+
+    init() {
+        this.renderChart(this.ALL_BRANCHES);
+        this.renderBranchTable(this.ALL_BRANCHES);
+        this.renderProductsTable();
+        this.setDefaultDates();
+    },
+
+    setDefaultDates() {
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        document.getElementById('f-date-start').value = firstDay.toISOString().split('T')[0];
+        document.getElementById('f-date-end').value = now.toISOString().split('T')[0];
+    },
+
+    getFilteredBranches() {
+        const val = document.getElementById('f-sucursal').value;
+        if (val === 'all') return this.ALL_BRANCHES;
+        return this.ALL_BRANCHES.filter(b => b.id == val);
+    },
+
+    renderChart(branches) {
+        const ctx = document.getElementById('chart-sucursales');
+        if (!ctx) return;
+        if (this.chart) this.chart.destroy();
+
+        const colors = ['#2D3A6B','#10B981','#F59E0B'];
+
+        this.chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: branches.map(b => b.nombre.replace('Sucursal ','').replace('Uuniversidad ','').replace('Universidad ','')),
+                datasets: [{
+                    label: 'Ventas del Mes',
+                    data: branches.map(b => b.ventas),
+                    backgroundColor: branches.map((_,i) => colors[i % colors.length] + 'CC'),
+                    borderColor: branches.map((_,i) => colors[i % colors.length]),
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => ' ' + this.fmt(ctx.raw) } }
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(0,0,0,0.04)' },
+                        ticks: { callback: v => '$' + (v/1000000).toFixed(0) + 'M' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    },
+
+    updateChart() {
+        const branches = this.getFilteredBranches();
+        this.renderChart(branches);
+        this.renderBranchTable(branches);
+
+        const val = document.getElementById('f-sucursal').value;
+        const sub = document.getElementById('chart-subtitle');
+        if (sub) {
+            sub.textContent = val === 'all'
+                ? 'Resultados de todas las sucursales · Marzo 2026'
+                : `Resultados: ${this.ALL_BRANCHES.find(b=>b.id==val)?.nombre} · Marzo 2026`;
+        }
+
+        const totalVentas = branches.reduce((a,b) => a+b.ventas, 0);
+        const totalPedidos = branches.reduce((a,b) => a+b.pedidos, 0);
+        document.getElementById('rep-ventas').textContent = this.fmt(totalVentas);
+        document.getElementById('rep-promedio').textContent = this.fmt(Math.round(totalVentas / branches.length));
+        document.getElementById('rep-pedidos').textContent = totalPedidos.toLocaleString('es-CO');
+        document.getElementById('rep-sucursales').textContent = branches.length;
+    },
+
+    renderBranchTable(branches) {
+        const tbody = document.getElementById('tabla-sucursales');
+        if (!tbody) return;
+        tbody.innerHTML = branches.map(b => `
+            <tr>
+                <td><strong style="color:var(--text-primary);">${b.nombre}</strong></td>
+                <td><strong style="color:var(--success);">${this.fmt(b.ventas)}</strong></td>
+                <td>${b.pedidos.toLocaleString('es-CO')}</td>
+                <td>${this.fmt(b.ticket)}</td>
+                <td>
+                    <div class="pct-bar-wrap">
+                        <div class="pct-bar-track">
+                            <div class="pct-bar" style="width:${b.pct}%;"></div>
+                        </div>
+                        <span style="font-weight:700;color:var(--text-primary);font-size:.8125rem;min-width:40px;text-align:right;">
+                            ${b.pct}%
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    },
+
+    renderProductsTable() {
+        const tbody = document.getElementById('tabla-productos');
+        if (!tbody) return;
+        tbody.innerHTML = this.PRODUCTS.map(p => {
+            const rankClass = p.pos === 1 ? 'rank-1' : p.pos === 2 ? 'rank-2' : p.pos === 3 ? 'rank-3' : 'rank-n';
+            const medal = p.pos === 1 ? '🥇' : p.pos === 2 ? '🥈' : p.pos === 3 ? '🥉' : p.pos;
+            return `
+            <tr>
+                <td><span class="rank-badge ${rankClass}">${typeof medal === 'string' ? medal : p.pos}</span></td>
+                <td><strong style="color:var(--text-primary);">${p.name}</strong></td>
+                <td><span style="padding:2px 10px;background:var(--info-light);color:var(--info);border-radius:9999px;font-size:.6875rem;font-weight:700;">${p.cat}</span></td>
+                <td>${p.units.toLocaleString('es-CO')}</td>
+                <td><strong style="color:var(--success);">${this.fmt(p.revenue)}</strong></td>
+            </tr>`;
+        }).join('');
+    },
+
+    generate() {
+        const dateStart = document.getElementById('f-date-start').value || 'No definida';
+        const dateEnd   = document.getElementById('f-date-end').value || 'No definida';
+        const sucursal  = document.getElementById('f-sucursal');
+        const tipo      = document.getElementById('f-tipo');
+        const sName = sucursal.options[sucursal.selectedIndex].text;
+        const tName = tipo.options[tipo.selectedIndex].text;
+
+        this.updateChart();
+
+        Swal.fire({
+            icon: 'success',
+            title: '✅ Reporte Generado',
+            html: `
+                <div style="text-align:left;display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+                    ${[
+                        ['fas fa-calendar','Período', `${dateStart} — ${dateEnd}`],
+                        ['fas fa-store','Sucursal', sName],
+                        ['fas fa-tag','Tipo', tName],
+                    ].map(([icon,label,val]) => `
+                    <div style="display:flex;gap:10px;align-items:center;padding:10px 14px;background:#F8FAFF;border-radius:10px;">
+                        <i class="${icon}" style="color:var(--primary-light);width:16px;"></i>
+                        <div>
+                            <div style="font-size:.6875rem;color:#8898AA;font-weight:600;text-transform:uppercase;">${label}</div>
+                            <div style="font-size:.875rem;font-weight:700;color:#1A1F36;">${val}</div>
+                        </div>
+                    </div>`).join('')}
+                </div>
+            `,
+            confirmButtonText: 'Excelente',
+            confirmButtonColor: '#0B132B',
+            width: '420px'
+        });
+    },
+
+    exportPDF() {
+        Swal.fire({
+            icon: 'info',
+            title: '🚧 Funcionalidad en desarrollo',
+            text: 'La exportación a PDF estará disponible próximamente.',
+            confirmButtonColor: '#0B132B'
+        });
+    },
+
+    exportExcel() {
+        Swal.fire({
+            icon: 'info',
+            title: '🚧 Funcionalidad en desarrollo',
+            text: 'La exportación a Excel estará disponible próximamente.',
+            confirmButtonColor: '#0B132B'
+        });
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!AuthService.isAuthenticated()) { window.location.href = '../index.html'; return; }
+    Reportes.init();
+});
+</script>
+</body>
+</html>

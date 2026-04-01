@@ -1,530 +1,269 @@
 /**
- * ========================================
- * ANTHONY CHEF - LOGIN MODULE
- * Sistema de Autenticación
- * ========================================
+ * ============================================================
+ * ANTHONY CHEF — LOGIN MODULE (UNIFICADO)
+ * Maneja autenticación para:
+ *   1. Dueño / Administrador General  → admin/dashboard.html
+ *   2. Encargado de Sucursal          → sucursal/pos.html
+ * ============================================================
  */
 
-// ========================================
-// CONFIGURACIÓN Y CONSTANTES
-// ========================================
+// ── RUTAS DE DESTINO ────────────────────────────────────────
+const REDIRECT_OWNER = 'admin/dashboard.html';
+const REDIRECT_SUCURSAL = 'sucursal/pos.html';
 
-const CREDENTIALS = {
-    OWNER: {
-        phone: '3001234567',
-        password: 'admin123',
-        role: 'owner'
-    },
-    ADMIN: {
-        username: 'admin1',
-        password: '1234',
-        role: 'admin'
-    }
-};
+// ── ESTADO ──────────────────────────────────────────────────
+let activeTab = 'owner'; // 'owner' | 'sucursal'
 
-const STORAGE_KEYS = {
-    CURRENT_USER: 'anthony_chef_current_user',
-    SESSION: 'anthony_chef_session'
-};
-
-const REDIRECT_URL = 'app.html';
-
-// ========================================
-// SELECTORES DEL DOM
-// ========================================
-
-const elements = {
-    tabs: document.querySelectorAll('.tab-btn'),
-    forms: {
-        owner: document.getElementById('owner-form'),
-        admin: document.getElementById('admin-form')
-    },
-    inputs: {
-        owner: {
-            phone: document.getElementById('owner-phone'),
-            password: document.getElementById('owner-password')
-        },
-        admin: {
-            username: document.getElementById('admin-username'),
-            password: document.getElementById('admin-password')
-        }
-    },
-    errors: {
-        owner: {
-            phone: document.getElementById('owner-phone-error'),
-            password: document.getElementById('owner-password-error')
-        },
-        admin: {
-            username: document.getElementById('admin-username-error'),
-            password: document.getElementById('admin-password-error')
-        }
-    },
-    toggleButtons: document.querySelectorAll('.toggle-password'),
-    message: document.getElementById('login-message')
-};
-
-// ========================================
-// UTILIDADES
-// ========================================
-
-/**
- * Limpia todos los errores de un formulario
- */
-function clearErrors(formType) {
-    const errorElements = elements.errors[formType];
-    Object.values(errorElements).forEach(errorEl => {
-        if (errorEl) errorEl.textContent = '';
-    });
-
-    const inputs = elements.inputs[formType];
-    Object.values(inputs).forEach(input => {
-        if (input) input.classList.remove('error');
-    });
-}
-
-/**
- * Muestra un error en un campo específico
- */
-function showError(field, formType, message) {
-    const errorEl = elements.errors[formType][field];
-    const inputEl = elements.inputs[formType][field];
-
-    if (errorEl) errorEl.textContent = message;
-    if (inputEl) inputEl.classList.add('error');
-}
-
-/**
- * Valida que un campo no esté vacío
- */
-function validateRequired(value, fieldName) {
-    if (!value || value.trim() === '') {
-        return `El campo ${fieldName} es requerido`;
-    }
-    return null;
-}
-
-/**
- * Valida un número de usuario
- */
-function validatePhone(phone) {
-    const phoneRegex = /^3\d{9}$/;
-    if (!phoneRegex.test(phone)) {
-        return 'Ingrese un usuario válido (ej: 3001234567)';
-    }
-    return null;
-}
-
-/**
- * Valida una contraseña
- */
-function validatePassword(password, minLength = 4) {
-    if (password.length < minLength) {
-        return `La contraseña debe tener al menos ${minLength} caracteres`;
-    }
-    return null;
-}
-
-/**
- * Muestra un mensaje de estado
- */
-function showMessage(message, type = 'info') {
-    elements.message.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'circle-notch fa-spin'}"></i>
-        <span>${message}</span>
-    `;
-    elements.message.className = `login-message show ${type}`;
-}
-
-/**
- * Oculta el mensaje de estado
- */
-function hideMessage() {
-    elements.message.classList.remove('show');
-}
-
-/**
- * Guarda la sesión del usuario
- */
-function saveSession(user) {
-    const sessionData = {
-        id: user.id,
-        email: user.email || user.phone,
-        role: user.role,
-        name: user.name,
-        branchId: user.branchId || null,
-        loginAt: new Date().toISOString()
-    };
-
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(sessionData));
-    localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify({
-        ...sessionData,
-        token: generateToken()
-    }));
-}
-
-/**
- * Genera un token simple para la sesión
- */
-function generateToken() {
-    return 'token_' + Math.random().toString(36).substr(2) + '_' + Date.now();
-}
-
-/**
- * Simula un delay de red
- */
+// ── UTILIDADES ──────────────────────────────────────────────
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ========================================
-// MANEJO DE PESTAÑAS
-// ========================================
+function showMessage(text, type = 'info') {
+    const el = document.getElementById('login-message');
+    const iconMap = {
+        info: 'fa-circle-notch fa-spin',
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle'
+    };
+    el.innerHTML = `
+        <span class="message-icon"><i class="fas ${iconMap[type] || iconMap.info}"></i></span>
+        <span class="message-text">${text}</span>`;
+    el.className = `login-message show ${type}`;
+}
 
-function initTabs() {
-    elements.tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabType = tab.dataset.tab;
+function hideMessage() {
+    document.getElementById('login-message').className = 'login-message';
+}
 
-            // Remover clase active de todas las pestañas
-            elements.tabs.forEach(t => t.classList.remove('active'));
+function setFieldError(inputId, errorId, msg) {
+    const input = document.getElementById(inputId);
+    const err = document.getElementById(errorId);
+    if (input) input.classList.add('error');
+    if (err) err.textContent = msg;
+}
 
-            // Ocultar todos los formularios
-            Object.values(elements.forms).forEach(form => {
-                form.classList.remove('active');
-            });
+function clearFieldError(inputId, errorId) {
+    const input = document.getElementById(inputId);
+    const err = document.getElementById(errorId);
+    if (input) input.classList.remove('error');
+    if (err) err.textContent = '';
+}
 
-            // Activar pestaña y formulario seleccionados
-            tab.classList.add('active');
-            elements.forms[tabType].classList.add('active');
-
-            // Limpiar errores y mensajes
-            clearErrors(tabType);
-            hideMessage();
-
-            // Enfocar el primer input del formulario
-            const firstInput = Object.values(elements.inputs[tabType])[0];
-            if (firstInput) {
-                setTimeout(() => firstInput.focus(), 100);
-            }
-        });
+function clearAllErrors() {
+    ['owner-phone', 'owner-password', 'suc-usuario', 'suc-password'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('error');
+    });
+    ['owner-phone-error', 'owner-password-error', 'suc-usuario-error', 'suc-password-error'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '';
     });
 }
 
-// ========================================
-// MANEJO DE CONTRASEÑAS
-// ========================================
+function showLoadingOverlay(msg = 'Autenticando...') {
+    const el = document.getElementById('loading-text');
+    if (el) el.textContent = msg;
+    document.getElementById('loading-overlay')?.classList.add('active');
+}
 
-function initPasswordToggle() {
-    elements.toggleButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const targetId = button.dataset.target;
-            const input = document.getElementById(targetId);
-            const icon = button.querySelector('i');
+// ── TABS ─────────────────────────────────────────────────────
+function initTabs() {
+    const tabOwner = document.getElementById('tab-owner');
+    const tabSuc = document.getElementById('tab-sucursal');
+    const formOwner = document.getElementById('owner-form');
+    const formSuc = document.getElementById('sucursal-form');
 
+    function activateTab(tab) {
+        activeTab = tab;
+        clearAllErrors();
+        hideMessage();
+
+        // Toggle tab buttons
+        tabOwner.classList.toggle('active', tab === 'owner');
+        tabSuc.classList.toggle('active', tab === 'sucursal');
+
+        // Toggle forms
+        formOwner.classList.toggle('active', tab === 'owner');
+        formSuc.classList.toggle('active', tab === 'sucursal');
+
+        // Focus first input
+        const focusId = tab === 'owner' ? 'owner-phone' : 'suc-usuario';
+        setTimeout(() => document.getElementById(focusId)?.focus(), 120);
+    }
+
+    tabOwner.addEventListener('click', () => activateTab('owner'));
+    tabSuc.addEventListener('click', () => activateTab('sucursal'));
+
+    // Check if already has a branch session → auto-switch
+    if (SucursalAuth.isAuthenticated()) {
+        window.location.href = REDIRECT_SUCURSAL;
+    }
+    // Check if already has an admin session → auto-switch
+    if (AuthService.isAuthenticated()) {
+        window.location.href = REDIRECT_OWNER;
+    }
+}
+
+// ── PASSWORD TOGGLE ──────────────────────────────────────────
+function initPasswordToggles() {
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const input = document.getElementById(btn.dataset.target);
+            const icon = btn.querySelector('i');
+            if (!input) return;
             if (input.type === 'password') {
                 input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-                button.classList.add('active');
+                icon.className = 'fas fa-eye-slash';
+                btn.classList.add('active');
             } else {
                 input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-                button.classList.remove('active');
+                icon.className = 'fas fa-eye';
+                btn.classList.remove('active');
             }
         });
     });
 }
 
-// ========================================
-// VALIDACIÓN DE FORMULARIOS
-// ========================================
-
-function validateOwnerForm() {
-    const phone = elements.inputs.owner.phone.value.trim();
-    const password = elements.inputs.owner.password.value;
-
-    let isValid = true;
-    clearErrors('owner');
-
-    // Validar usuario
-    const phoneError = validateRequired(phone, 'usuario') || validatePhone(phone);
-    if (phoneError) {
-        showError('phone', 'owner', phoneError);
-        isValid = false;
-    }
-
-    // Validar contraseña
-    const passwordError = validateRequired(password, 'contraseña') || validatePassword(password);
-    if (passwordError) {
-        showError('password', 'owner', passwordError);
-        isValid = false;
-    }
-
-    return { isValid, phone, password };
-}
-
-function validateAdminForm() {
-    const username = elements.inputs.admin.username.value.trim();
-    const password = elements.inputs.admin.password.value;
-
-    let isValid = true;
-    clearErrors('admin');
-
-    // Validar usuario
-    const usernameError = validateRequired(username, 'usuario o correo');
-    if (usernameError) {
-        showError('username', 'admin', usernameError);
-        isValid = false;
-    }
-
-    // Validar contraseña
-    const passwordError = validateRequired(password, 'contraseña') || validatePassword(password);
-    if (passwordError) {
-        showError('password', 'admin', passwordError);
-        isValid = false;
-    }
-
-    return { isValid, username, password };
-}
-
-// ========================================
-// AUTENTICACIÓN
-// ========================================
-
-async function authenticateOwner(phone, password) {
-    await delay(800); // Simular delay de red
-
-    const credentials = CREDENTIALS.OWNER;
-
-    if (phone !== credentials.phone) {
-        throw new Error('El número de usuario no está registrado');
-    }
-
-    if (password !== credentials.password) {
-        throw new Error('Contraseña incorrecta');
-    }
-
-    // Usuario autenticado exitosamente
-    return {
-        id: 'owner_001',
-        phone: credentials.phone,
-        role: credentials.role,
-        name: 'Dueño del Restaurante',
-        branchId: null // El dueño tiene acceso a todas las sucursales
-    };
-}
-
-async function authenticateAdmin(username, password) {
-    await delay(800); // Simular delay de red
-
-    const credentials = CREDENTIALS.ADMIN;
-
-    // Validar usuario (acepta tanto username como email)
-    const isUsernameValid = username.toLowerCase() === credentials.username;
-    const isEmailValid = username.toLowerCase() === 'admin@restaurante.com';
-
-    if (!isUsernameValid && !isEmailValid) {
-        throw new Error('El usuario no está registrado');
-    }
-
-    if (password !== credentials.password) {
-        throw new Error('Contraseña incorrecta');
-    }
-
-    // Administrador autenticado exitosamente
-    return {
-        id: 'admin_001',
-        username: credentials.username,
-        email: 'admin@restaurante.com',
-        role: credentials.role,
-        name: 'Administrador',
-        branchId: 'branch_001' // El admin tiene una sucursal asignada
-    };
-}
-
-// ========================================
-// LOADING OVERLAY
-// ========================================
-
-/**
- * Muestra el overlay de carga con animación
- */
-function showLoadingOverlay() {
-    const loadingOverlay = document.getElementById('loading-overlay');
-    if (loadingOverlay) {
-        loadingOverlay.classList.add('active');
-    }
-}
-
-/**
- * Oculta el overlay de carga con animación
- */
-function hideLoadingOverlay() {
-    const loadingOverlay = document.getElementById('loading-overlay');
-    if (loadingOverlay) {
-        loadingOverlay.classList.remove('active');
-    }
-}
-
-// ========================================
-// MANEJO DE ENVÍO DE FORMULARIOS
-// ========================================
-
-async function handleOwnerSubmit(event) {
-    event.preventDefault();
-
-    const validation = validateOwnerForm();
-
-    if (!validation.isValid) {
-        return;
-    }
-
-    try {
-        // Mostrar estado de carga
-        showMessage('Verificando credenciales...', 'info');
-
-        // Deshabilitar botón
-        const submitBtn = event.target.querySelector('.btn-login');
-        submitBtn.disabled = true;
-
-        // Autenticar
-        const user = await authenticateOwner(validation.phone, validation.password);
-
-        // Guardar sesión
-        saveSession(user);
-
-        // Mostrar overlay de carga premium
-        showLoadingOverlay();
-
-        // Esperar un momento antes de redirigir
-        await delay(1500);
-
-        // Redirigir al dashboard
-        window.location.href = REDIRECT_URL;
-
-    } catch (error) {
-        showMessage(error.message, 'error');
-
-        // Rehabilitar botón
-        event.target.querySelector('.btn-login').disabled = false;
-
-        // Marcar campo de contraseña como error
-        elements.inputs.owner.password.classList.add('error');
-    }
-}
-
-async function handleAdminSubmit(event) {
-    event.preventDefault();
-
-    const validation = validateAdminForm();
-
-    if (!validation.isValid) {
-        return;
-    }
-
-    try {
-        // Mostrar estado de carga
-        showMessage('Verificando credenciales...', 'info');
-
-        // Deshabilitar botón
-        const submitBtn = event.target.querySelector('.btn-login');
-        submitBtn.disabled = true;
-
-        // Autenticar
-        const user = await authenticateAdmin(validation.username, validation.password);
-
-        // Guardar sesión
-        saveSession(user);
-
-        // Mostrar overlay de carga premium
-        showLoadingOverlay();
-
-        // Esperar un momento antes de redirigir
-        await delay(1500);
-
-        // Redirigir al dashboard
-        window.location.href = REDIRECT_URL;
-
-    } catch (error) {
-        showMessage(error.message, 'error');
-
-        // Rehabilitar botón
-        event.target.querySelector('.btn-login').disabled = false;
-
-        // Marcar campo de contraseña como error
-        elements.inputs.admin.password.classList.add('error');
-    }
-}
-
-function initFormHandlers() {
-    // Owner form
-    elements.forms.owner.addEventListener('submit', handleOwnerSubmit);
-
-    // Admin form
-    elements.forms.admin.addEventListener('submit', handleAdminSubmit);
-
-    // Limpiar errores al escribir
-    Object.entries(elements.inputs).forEach(([formType, inputs]) => {
-        Object.entries(inputs).forEach(([field, input]) => {
-            input.addEventListener('input', () => {
-                elements.errors[formType][field].textContent = '';
-                input.classList.remove('error');
-            });
-
-            input.addEventListener('blur', () => {
-                // Validación en tiempo real opcional
-            });
+// ── LIVE INPUT CLEAR ERRORS ──────────────────────────────────
+function initInputListeners() {
+    const pairs = [
+        ['owner-phone', 'owner-phone-error'],
+        ['owner-password', 'owner-password-error'],
+        ['suc-usuario', 'suc-usuario-error'],
+        ['suc-password', 'suc-password-error']
+    ];
+    pairs.forEach(([inputId, errId]) => {
+        document.getElementById(inputId)?.addEventListener('input', () => {
+            clearFieldError(inputId, errId);
+            hideMessage();
         });
     });
 }
 
-// ========================================
-// VERIFICAR SESIÓN EXISTENTE
-// ========================================
+// ── AUTH: DUEÑO / ADMINISTRADOR GENERAL ─────────────────────
+async function handleOwnerSubmit(e) {
+    e.preventDefault();
+    clearAllErrors();
 
-function checkExistingSession() {
-    const currentUser = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+    const celular = document.getElementById('owner-phone').value.trim();
+    const password = document.getElementById('owner-password').value;
+    let valid = true;
 
-    if (currentUser) {
-        try {
-            const user = JSON.parse(currentUser);
-            // Si hay una sesión activa, redirigir directamente
-            console.log('Sesión existente detectada:', user);
-            // Opcional: Redirigir automáticamente
-            // window.location.href = REDIRECT_URL;
-        } catch (error) {
-            console.error('Error al parsear sesión:', error);
-            localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-        }
+    if (!celular) {
+        setFieldError('owner-phone', 'owner-phone-error', 'El número de celular es requerido');
+        valid = false;
+    } else if (celular.replace(/\D/g, '').length < 10) {
+        setFieldError('owner-phone', 'owner-phone-error', 'El celular debe tener mínimo 10 dígitos');
+        valid = false;
     }
+    if (!password) {
+        setFieldError('owner-password', 'owner-password-error', 'La contraseña es requerida');
+        valid = false;
+    }
+    if (!valid) return;
+
+    const btn = document.getElementById('owner-submit');
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    showMessage('Verificando credenciales...', 'info');
+
+    await delay(800);
+
+    const usuario = AuthService.login(celular, password);
+
+    if (!usuario || usuario.rol !== 'dueño') {
+        showMessage('Credenciales incorrectas. Verifica tu celular y contraseña.', 'error');
+        document.getElementById('owner-password').classList.add('error');
+        btn.disabled = false;
+        btn.classList.remove('is-loading');
+        return;
+    }
+
+    AuthService.guardarSesion(usuario);
+    await startSuccessAnimation('¡Acceso concedido! Bienvenido/a', 'Cargando panel ejecutivo...');
+    window.location.href = REDIRECT_OWNER;
 }
 
-// ========================================
-// INICIALIZACIÓN
-// ========================================
+// ── AUTH: ENCARGADO DE SUCURSAL ──────────────────────────────
+async function handleSucursalSubmit(e) {
+    e.preventDefault();
+    clearAllErrors();
 
-function init() {
-    // Verificar sesión existente
-    checkExistingSession();
+    const usuario = document.getElementById('suc-usuario').value.trim();
+    const password = document.getElementById('suc-password').value;
+    let valid = true;
 
-    // Inicializar pestañas
+    if (!usuario) {
+        setFieldError('suc-usuario', 'suc-usuario-error', 'El usuario de sucursal es requerido');
+        valid = false;
+    }
+    if (!password) {
+        setFieldError('suc-password', 'suc-password-error', 'La contraseña es requerida');
+        valid = false;
+    }
+    if (!valid) return;
+
+    const btn = document.getElementById('suc-submit');
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    showMessage('Verificando credenciales...', 'info');
+
+    await delay(800);
+
+    const session = SucursalAuth.login(usuario, password);
+
+    if (!session) {
+        showMessage('Usuario o contraseña incorrectos. Verifica tus credenciales.', 'error');
+        document.getElementById('suc-password').classList.add('error');
+        btn.disabled = false;
+        btn.classList.remove('is-loading');
+        return;
+    }
+
+    await startSuccessAnimation(`¡Bienvenido/a! Accediendo a ${session.nombre}`, `Abriendo panel de ${session.nombre}...`);
+    window.location.href = REDIRECT_SUCURSAL;
+}
+
+// ── ANIMATION SEQUENCES ──────────────────────────────────────
+async function startSuccessAnimation(message, overlayMsg) {
+    const wrapper = document.querySelector('.login-wrapper');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    
+    // 1. Show success message in form
+    showMessage(message, 'success');
+    
+    // 2. Short wait to "digest" success
+    await delay(500);
+    
+    // 3. Trigger cinematic hero transition
+    wrapper.classList.add('auth-success');
+    
+    // 4. Wait for hero zoom to be noticeable
+    await delay(1000);
+    
+    // 5. Fade in the final loading overlay
+    showLoadingOverlay(overlayMsg);
+    
+    // 6. Final dramatic pause
+    await delay(800);
+    
+    // 7. Last exit fade
+    wrapper.classList.add('exit-page');
+    await delay(400);
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
     initTabs();
+    initPasswordToggles();
+    initInputListeners();
 
-    // Inicializar toggle de contraseñas
-    initPasswordToggle();
+    document.getElementById('owner-form').addEventListener('submit', handleOwnerSubmit);
+    document.getElementById('sucursal-form').addEventListener('submit', handleSucursalSubmit);
 
-    // Inicializar handlers de formularios
-    initFormHandlers();
+    // Focus first input
+    setTimeout(() => document.getElementById('owner-phone')?.focus(), 300);
 
-    // Enfocar primer input
-    const firstInput = elements.inputs.owner.phone;
-    if (firstInput) {
-        setTimeout(() => firstInput.focus(), 300);
-    }
-
-    console.log('Login module initialized');
-}
-
-// Iniciar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', init);
+    console.log('[AnthonyChef] Login unificado — v2.0');
+});

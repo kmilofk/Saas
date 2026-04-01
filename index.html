@@ -5,18 +5,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Anthony Chef | Sistema de Gestión</title>
+    <meta name="description" content="Acceso al sistema de gestión multi-sucursal Anthony Chef">
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Google Fonts - Plus Jakarta Sans (Premium SaaS Font) -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Login Styles -->
     <link rel="stylesheet" href="assets/css/login.css">
+
+    <style>
+        /* ── OVERRIDES & ADDITIONS FOR UNIFIED LOGIN ── */
+
+        /* Hint panel */
+        .credentials-hint {
+            margin-top: 1.125rem;
+            padding: 0.875rem 1rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(11, 19, 43, 0.04));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: var(--radius-lg);
+        }
+
+        .credentials-hint .hint-title {
+            font-size: 0.6875rem;
+            font-weight: 800;
+            color: #3B82F6;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .credentials-hint ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .credentials-hint li {
+            font-size: 0.75rem;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .credentials-hint code {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1e40af;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.6875rem;
+        }
+
+        /* Sucursal tab — override tab icon color */
+        .tab-btn[data-tab="sucursal"].active {
+            color: #059669;
+        }
+
+        .tab-btn[data-tab="sucursal"].active i {
+            color: #059669;
+        }
+
+        .tab-btn[data-tab="sucursal"]:hover {
+            color: #059669;
+        }
+
+        /* Sucursal login button — deep navy */
+        #sucursal-form .btn-login {
+            background: linear-gradient(135deg, #0B132B 0%, #1A2847 100%);
+            box-shadow: 0 4px 16px rgba(11, 19, 43, 0.35);
+        }
+
+        #sucursal-form .btn-login:hover {
+            box-shadow: 0 6px 22px rgba(11, 19, 43, 0.45);
+        }
+
+        /* Error state for sucursal inputs */
+        #sucursal-form .input-wrapper input:focus {
+            border-color: #0B132B;
+            box-shadow: 0 0 0 4px rgba(11, 19, 43, 0.1);
+        }
+
+        /* Login message info state */
+        .login-message.info {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .logo-subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            margin-bottom: 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -28,45 +122,46 @@
         <div class="bg-grid"></div>
     </div>
 
-    <!-- Main Login Wrapper - Two Column Layout -->
+    <!-- Main Login Wrapper -->
     <div class="login-wrapper">
-        <!-- Left Side - Login Form -->
+
+        <!-- ══════════════════════════════════════
+             LEFT SIDE — FORM
+             ══════════════════════════════════════ -->
         <div class="login-left">
             <div class="login-card">
-                <!-- Card Glow Effect -->
                 <div class="card-glow"></div>
 
-                <!-- Welcome Text -->
+                <!-- Welcome -->
                 <div class="welcome-section">
                     <h2 class="welcome-title">¡Bienvenido de nuevo!</h2>
-                    <p class="welcome-text">Ingresa a tu cuenta para continuar</p>
+                    <p class="welcome-text">Selecciona tu tipo de acceso para continuar</p>
                 </div>
 
-                <!-- Tab Switcher -->
+                <!-- ── TABS ── -->
                 <div class="login-tabs">
-                    <button class="tab-btn active" data-tab="owner">
+                    <button class="tab-btn active" data-tab="owner" id="tab-owner">
                         <i class="fas fa-crown"></i>
-                        <span>Dueño</span>
+                        <span>Dueño / Admin</span>
                     </button>
-                    <button class="tab-btn" data-tab="admin">
-                        <i class="fas fa-user-tie"></i>
-                        <span>Administrador</span>
+                    <button class="tab-btn" data-tab="sucursal" id="tab-sucursal">
+                        <i class="fas fa-store"></i>
+                        <span>Encargado</span>
                     </button>
                 </div>
 
-                <!-- Owner Login Form -->
-                <form id="owner-form" class="login-form active">
+                <!-- ── FORM: DUEÑO / ADMINISTRADOR GENERAL ── -->
+                <form id="owner-form" class="login-form active" novalidate>
+
                     <div class="form-group">
                         <label for="owner-phone">
-                            <i class="fas fa-user"></i>
-                            <span>Usuario</span>
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Número de Celular</span>
                         </label>
                         <div class="input-wrapper">
-                            <input type="text" id="owner-phone" name="phone" placeholder="Ingresa tu usuario"
-                                autocomplete="username">
-                            <span class="input-icon">
-                                <i class="fas fa-user"></i>
-                            </span>
+                            <input type="text" id="owner-phone" name="phone" placeholder="3001234567"
+                                autocomplete="tel">
+                            <span class="input-icon"><i class="fas fa-mobile-alt"></i></span>
                         </div>
                         <span class="error-message" id="owner-phone-error"></span>
                     </div>
@@ -86,92 +181,100 @@
                         <span class="error-message" id="owner-password-error"></span>
                     </div>
 
-                    <button type="submit" class="btn-login">
-                        <span class="btn-text">Ingresar como Dueño</span>
-                        <span class="btn-icon">
-                            <i class="fas fa-arrow-right"></i>
-                        </span>
+                    <button type="submit" class="btn-login" id="owner-submit">
+                        <span class="btn-text">Ingresar al Panel Ejecutivo</span>
+                        <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
                     </button>
+
+                    <!-- Credentials hint -->
+                    <div class="credentials-hint">
+                        <div class="hint-title"><i class="fas fa-key"></i> Credenciales de prueba</div>
+                        <ul>
+                            <li><strong>Celular:</strong> <code>3001234567</code></li>
+                            <li><strong>Contraseña:</strong> <code>dueno123</code></li>
+                        </ul>
+                    </div>
                 </form>
 
-                <!-- Admin Login Form -->
-                <form id="admin-form" class="login-form">
+                <!-- ── FORM: ENCARGADO DE SUCURSAL ── -->
+                <form id="sucursal-form" class="login-form" novalidate>
+
                     <div class="form-group">
-                        <label for="admin-username">
-                            <i class="fas fa-user"></i>
-                            <span>Usuario o Correo</span>
+                        <label for="suc-usuario">
+                            <i class="fas fa-store"></i>
+                            <span>Usuario de Sucursal</span>
                         </label>
                         <div class="input-wrapper">
-                            <input type="text" id="admin-username" name="username" placeholder="admin1"
+                            <input type="text" id="suc-usuario" name="usuario" placeholder="Ej: san.cayetano"
                                 autocomplete="username">
-                            <span class="input-icon">
-                                <i class="fas fa-user"></i>
-                            </span>
+                            <span class="input-icon"><i class="fas fa-user"></i></span>
                         </div>
-                        <span class="error-message" id="admin-username-error"></span>
+                        <span class="error-message" id="suc-usuario-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="admin-password">
+                        <label for="suc-password">
                             <i class="fas fa-lock"></i>
                             <span>Contraseña</span>
                         </label>
                         <div class="input-wrapper">
-                            <input type="password" id="admin-password" name="password" placeholder="••••••••"
+                            <input type="password" id="suc-password" name="password" placeholder="••••••••"
                                 autocomplete="current-password">
-                            <button type="button" class="toggle-password" data-target="admin-password" tabindex="-1">
+                            <button type="button" class="toggle-password" data-target="suc-password" tabindex="-1">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
-                        <span class="error-message" id="admin-password-error"></span>
+                        <span class="error-message" id="suc-password-error"></span>
                     </div>
 
-                    <button type="submit" class="btn-login">
-                        <span class="btn-text">Ingresar como Administrador</span>
-                        <span class="btn-icon">
-                            <i class="fas fa-arrow-right"></i>
-                        </span>
+                    <button type="submit" class="btn-login" id="suc-submit">
+                        <span class="btn-text">Ingresar al Panel de Sucursal</span>
+                        <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
                     </button>
+
+                    <!-- Credentials hint -->
+                    <div class="credentials-hint">
+                        <div class="hint-title"><i class="fas fa-key"></i> Credenciales de prueba</div>
+                        <ul>
+                            <li><strong>San Cayetano:</strong> <code>san.cayetano</code> / <code>cayetano123</code></li>
+                            <li><strong>Icesi:</strong> <code>icesi</code> / <code>icesi123</code></li>
+                            <li><strong>Fábrica:</strong> <code>fabrica</code> / <code>fabrica123</code></li>
+                        </ul>
+                    </div>
                 </form>
 
-                <!-- Login Status Message -->
+                <!-- Status Message -->
                 <div class="login-message" id="login-message">
-                    <span class="message-icon">
-                        <i class="fas fa-circle-notch fa-spin"></i>
-                    </span>
+                    <span class="message-icon"><i class="fas fa-circle-notch fa-spin"></i></span>
                     <span class="message-text">Autenticando...</span>
                 </div>
 
-                <!-- Security Badge (Moved inside card) -->
+                <!-- Security Badge -->
                 <div class="security-badge">
                     <i class="fas fa-shield-halved"></i>
-                    <span>Acceso seguro y encriptado</span>
+                    <span>Acceso seguro — Anthony Chef © 2026</span>
                 </div>
             </div>
-
-            <!-- Footer -->
-            <footer class="login-footer">
-                <p>&copy; 2026 Anthony Chef. Todos los derechos reservados.</p>
-            </footer>
         </div>
 
-        <!-- Right Side - Logo Section -->
+        <!-- ══════════════════════════════════════
+             RIGHT SIDE — BRANDING
+             ══════════════════════════════════════ -->
         <div class="login-right">
             <div class="logo-section">
                 <div class="logo-glow-bg"></div>
                 <div class="logo-ring logo-ring-1"></div>
                 <div class="logo-ring logo-ring-2"></div>
                 <div class="logo-ring logo-ring-3"></div>
+
                 <img src="assets/logo.png" alt="Anthony Chef" class="main-logo">
                 <h1 class="logo-title">Anthony Chef</h1>
                 <p class="logo-subtitle">Plataforma de Gestión Multi-Sucursal</p>
+
                 <div class="logo-decoration"></div>
             </div>
         </div>
     </div>
-
-    <!-- Login Script -->
-    <script src="assets/js/login.js"></script>
 
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loading-overlay">
@@ -184,7 +287,7 @@
                 <div class="loading-glow"></div>
             </div>
             <h2 class="loading-title">Anthony Chef</h2>
-            <p class="loading-text">Autenticando...</p>
+            <p class="loading-text" id="loading-text">Autenticando...</p>
             <div class="loading-spinner">
                 <div class="spinner-ring"></div>
                 <div class="spinner-ring"></div>
@@ -192,6 +295,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Auth services -->
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sucursal-core.js"></script>
+    <script src="assets/js/login.js"></script>
 </body>
 
 </html>

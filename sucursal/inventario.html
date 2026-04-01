@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario | Anthony Chef</title>
+    <meta name="description" content="Gestión de inventario — Anthony Chef Panel de Sucursal">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --sidebar: #0B132B;
+            --sidebar-active: rgba(59, 130, 246, 0.18);
+            --bg: #F0F4FF;
+            --card: #FFFFFF;
+            --primary: #0B132B;
+            --primary-hover: #1A2542;
+            --accent: #3B82F6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --border: #E8EDF5;
+            --border2: #D1D9E6;
+            --text1: #1A1F36;
+            --text2: #5A6E8A;
+            --text3: #8898AA;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --r: 12px;
+            --sidebar-w: 260px;
+            --header-h: 68px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text1);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ========================================
+           CUSTOM SCROLLBAR PREMIUM
+           ======================================== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #CBD5E1, #94A3B8);
+            border-radius: 9999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #94A3B8, #64748B);
+        }
+
+        /* Scrollbar suave para elementos específicos */
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--sidebar);
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar-logo {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo img {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .sidebar-logo-text .name {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .sidebar-logo-text .tagline {
+            font-size: 0.6875rem;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+
+        .sidebar-branch {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-branch .label {
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-branch .suc-branch-name {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .sidebar-branch .suc-encargado {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .sidebar-nav-label {
+            padding: 16px 20px 6px;
+            font-size: 0.625rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        nav#suc-nav {
+            flex: 1;
+            padding: 4px 0;
+        }
+
+        .suc-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
+
+        .suc-nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .suc-nav-item.active {
+            background: var(--sidebar-active);
+            color: #fff;
+            border-left-color: var(--accent);
+        }
+
+        .suc-nav-item i {
+            width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .btn-logout-suc {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: var(--r);
+            color: #FC8181;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-logout-suc:hover {
+            background: rgba(239, 68, 68, 0.22);
+        }
+
+        /* ========================================
+           LAYOUT PRINCIPAL - DESKTOP APP STYLE
+           ======================================== */
+        .main-wrap {
+            margin-left: var(--sidebar-w);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .page-header {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: var(--header-h);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
+            z-index: 50;
+        }
+
+        .page-header h1 {
+            font-size: 1.125rem;
+            font-weight: 800;
+            color: var(--text1);
+            letter-spacing: -0.02em;
+        }
+
+        .page-header p {
+            font-size: 0.75rem;
+            color: var(--text2);
+            font-weight: 500;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--r);
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        /* ========================================
+           CONTENIDO PRINCIPAL - SCROLL INDEPENDIENTE
+           ======================================== */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 32px 32px;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+        }
+
+        .content-inner {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ========================================
+           ESTADÍSTICAS - TARJETAS PREMIUM
+           ======================================== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 18px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.4),
+                    transparent);
+            transition: left 0.5s ease;
+        }
+
+        .stat-card:hover::after {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Animación de entrada escalonada */
+        .stat-card {
+            animation: statCardIn 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .stat-card:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes statCardIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .stat-card:nth-child(1)::before {
+            background: linear-gradient(90deg, #3B82F6, #2D3A6B);
+        }
+
+        .stat-card:nth-child(2)::before {
+            background: linear-gradient(90deg, #10B981, #059669);
+        }
+
+        .stat-card:nth-child(3)::before {
+            background: linear-gradient(90deg, #EF4444, #DC2626);
+        }
+
+        .stat-card:nth-child(4)::before {
+            background: linear-gradient(90deg, #F59E0B, #D97706);
+        }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--r);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #3B82F6, #2D3A6B);
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #10B981, #059669);
+        }
+
+        .stat-icon.red {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+        }
+
+        .stat-icon.yellow {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+        }
+
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text1);
+            line-height: 1;
+        }
+
+        .stat-val.danger {
+            color: var(--danger);
+        }
+
+        .stat-lbl {
+            font-size: 0.6875rem;
+            color: var(--text3);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ========================================
+           TOOLBAR - BÚSQUEDA Y FILTROS
+           ======================================== */
+        .toolbar {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFF 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.2s ease;
+            animation: toolbarIn 0.5s ease 0.25s forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes toolbarIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toolbar:focus-within {
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg);
+            border: 1.5px solid var(--border2);
+            border-radius: var(--r);
+            min-width: 240px;
+            transition: all 0.2s ease;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-box i {
+            color: var(--text3);
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 0.875rem;
+            color: var(--text1);
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text3);
+        }
+
+        .filter-select-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: var(--bg);
+            border: 1.5px solid var(--border2);
+            border-radius: var(--r);
+            transition: all 0.2s ease;
+        }
+
+        .filter-select-wrap:focus-within {
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-select-wrap i {
+            color: var(--text3);
+            font-size: .875rem;
+        }
+
+        .filter-select-wrap select {
+            border: none;
+            background: transparent;
+            font-size: 0.875rem;
+            color: var(--text1);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            cursor: pointer;
+            min-width: 120px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        /* ========================================
+           TABLA DE INVENTARIO - ESTILO PREMIUM
+           ======================================== */
+        .table-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 280px);
+            animation: tableCardIn 0.6s ease 0.35s forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes tableCardIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #F8FAFF 0%, #FFFFFF 100%);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            box-shadow: 0 1px 0 rgba(232, 237, 245, 0.8);
+            position: relative;
+        }
+
+        .table-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+        }
+
+        .table-header h3 {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--text1);
+        }
+
+        .table-count {
+            margin-left: auto;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text3);
+            background: var(--bg);
+            padding: 4px 12px;
+            border-radius: 9999px;
+        }
+
+        .table-wrapper {
+            flex: 1;
+            overflow: auto;
+            scroll-behavior: smooth;
+            padding: 8px;
+        }
+
+        .table-wrapper .data-table {
+            margin: 0 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #CBD5E1, #94A3B8);
+            border-radius: 9999px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            padding: 14px 20px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            background: #F8FAFF;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table td {
+            padding: 14px 20px;
+            font-size: 0.8125rem;
+            color: var(--text2);
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: #FAFCFF;
+            transition: background-color 0.15s ease;
+            box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.05);
+        }
+
+        .low-row td {
+            background: #FFF5F5 !important;
+        }
+
+        /* Stock bar */
+        .stock-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stock-bar-track {
+            flex: 1;
+            height: 6px;
+            background: var(--bg);
+            border-radius: 9999px;
+            overflow: hidden;
+            min-width: 60px;
+        }
+
+        .stock-bar {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+            background-image: linear-gradient(45deg,
+                    rgba(255, 255, 255, 0.15) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, 0.15) 50%,
+                    rgba(255, 255, 255, 0.15) 75%,
+                    transparent 75%,
+                    transparent);
+            background-size: 8px 8px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            gap: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .badge:hover {
+            transform: scale(1.05);
+        }
+
+        .badge-ok {
+            background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+            color: #065F46;
+            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
+        }
+
+        .badge-low {
+            background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+            color: #991B1B;
+            box-shadow: 0 1px 2px rgba(239, 68, 68, 0.1);
+        }
+
+        .badge-zero {
+            background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+            color: #6B7280;
+            box-shadow: 0 1px 2px rgba(107, 114, 128, 0.1);
+        }
+
+        /* Action buttons */
+        .act-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-act {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            border-radius: var(--r);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            border: 1.5px solid;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .btn-act:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-act:active {
+            transform: translateY(0);
+        }
+
+        .btn-act.adjust {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-act.adjust:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-act.edit {
+            border-color: var(--border2);
+            color: var(--text2);
+        }
+
+        .btn-act.edit:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-act.del {
+            border-color: #FECACA;
+            color: var(--danger);
+        }
+
+        .btn-act.del:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 64px 16px;
+            color: var(--text3);
+        }
+
+        .empty-row i {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 16px;
+            opacity: 0.3;
+            animation: emptyPulse 2s ease infinite;
+        }
+
+        @keyframes emptyPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        .empty-row p {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text2);
+            margin-bottom: 4px;
+        }
+
+        .empty-row small {
+            font-size: 0.8125rem;
+            color: var(--text3);
+        }
+
+        /* ========================================
+           MODALES - ESTILO PREMIUM
+           ======================================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transform: scale(0.95) translateY(10px);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.open .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-hdr {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #F8FAFF 0%, #FFFFFF 100%);
+        }
+
+        .modal-hdr h2 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-hdr h2::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            background: var(--bg);
+            border: none;
+            cursor: pointer;
+            color: var(--text3);
+            font-size: 1.125rem;
+            border-radius: var(--r);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 24px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #CBD5E1, #94A3B8);
+            border-radius: 9999px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            background: linear-gradient(135deg, #F8FAFF 0%, #FFFFFF 100%);
+        }
+
+        .fm-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .fm-group {
+            margin-bottom: 14px;
+        }
+
+        .fm-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text1);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .fm-input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border2);
+            border-radius: var(--r);
+            font-size: 0.875rem;
+            color: var(--text1);
+            background: var(--bg);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .fm-input:focus {
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .fm-input::placeholder {
+            color: var(--text3);
+        }
+
+        .fm-input:focus::placeholder {
+            opacity: 0.7;
+        }
+
+        select.fm-input {
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238898AA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
+        }
+
+        .btn-modal-save {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 11px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, #1A2542 100%);
+            color: white;
+            border: none;
+            border-radius: var(--r);
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 2px 8px rgba(11, 19, 43, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-modal-save:hover {
+            background: linear-gradient(135deg, var(--primary-hover) 0%, #2D3A5B 100%);
+            box-shadow: 0 4px 16px rgba(11, 19, 43, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-modal-save:active {
+            transform: translateY(0);
+        }
+
+        .btn-modal-cancel {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 11px 24px;
+            background: white;
+            color: var(--text2);
+            border: 1.5px solid var(--border2);
+            border-radius: var(--r);
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .btn-modal-cancel:hover {
+            background: var(--bg);
+            border-color: var(--text3);
+            transform: translateY(-1px);
+        }
+
+        .btn-modal-cancel:active {
+            transform: translateY(0);
+        }
+
+        /* ========================================
+           ACCESIBILIDAD - FOCUS VISIBLE
+           ======================================== */
+        :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        button:focus-visible,
+        [tabindex]:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* Skip link para navegación por teclado */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            z-index: 10000;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 0 0 var(--r) 0;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Reducir movimiento para usuarios con preferencia de movimiento reducido */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* ========================================
+           NOTIFICACIONES TOAST - ESTILO PREMIUM
+           ======================================== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: var(--card);
+            border-radius: var(--r);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            min-width: 320px;
+            max-width: 420px;
+            pointer-events: auto;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-left: 4px solid;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.hide {
+            transform: translateX(120%);
+            opacity: 0;
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.75rem;
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.success .toast-icon {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast.error .toast-icon {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast.warning .toast-icon {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .toast.info {
+            border-left-color: var(--accent);
+        }
+
+        .toast.info .toast-icon {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toast-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text1);
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-size: 0.75rem;
+            color: var(--text2);
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            color: var(--text3);
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .toast-close:hover {
+            background: var(--bg);
+            color: var(--text1);
+        }
+
+        /* ========================================
+           RESPONSIVE - ADAPTACIÓN A DIFERENTES PANTALLAS
+           ======================================== */
+        @media (max-width: 1100px) {
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .table-card {
+                max-height: calc(100vh - 320px);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+
+            .main-wrap {
+                margin-left: 0;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .page-header {
+                padding: 0 16px;
+            }
+
+            .table-card {
+                max-height: calc(100vh - 340px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .fm-row {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                height: auto;
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .page-header h1 {
+                font-size: 1rem;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .table-card {
+                max-height: calc(100vh - 380px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Skip link para accesibilidad -->
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+    <!-- Contenedor de notificaciones Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <img src="../assets/logo.png" alt="Anthony Chef">
+            <div class="sidebar-logo-text">
+                <div class="name">Anthony Chef</div>
+                <div class="tagline">Panel Sucursal</div>
+            </div>
+        </div>
+        <div class="sidebar-branch">
+            <div class="label">Sucursal activa</div>
+            <div class="suc-branch-name">Cargando...</div>
+            <div class="suc-encargado">—</div>
+        </div>
+        <div class="sidebar-nav-label">Módulos</div>
+        <nav id="suc-nav"></nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout-suc" onclick="doLogout()">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </div>
+    </div>
+
+    <div class="main-wrap">
+        <header class="page-header">
+            <div>
+                <h1><i class="fas fa-boxes-stacked" style="color:var(--accent);margin-right:8px;"></i>Inventario</h1>
+                <p class="suc-branch-name">Cargando sucursal...</p>
+            </div>
+            <div class="header-right">
+                <button class="btn-primary" onclick="Inv.openAddModal()">
+                    <i class="fas fa-plus"></i> Agregar Producto
+                </button>
+            </div>
+        </header>
+
+        <main class="content scroll-smooth" id="main-content">
+            <div class="content-inner">
+                <!-- STATS -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fas fa-boxes-stacked"></i></div>
+                        <div>
+                            <div class="stat-val" id="s-total">0</div>
+                            <div class="stat-lbl">Total Productos</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                        <div>
+                            <div class="stat-val" id="s-ok">0</div>
+                            <div class="stat-lbl">Stock Normal</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div>
+                            <div class="stat-val danger" id="s-bajo">0</div>
+                            <div class="stat-lbl">Stock Bajo</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow"><i class="fas fa-dollar-sign"></i></div>
+                        <div>
+                            <div class="stat-val" id="s-valor">$0</div>
+                            <div class="stat-lbl">Valor Total</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOOLBAR -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Buscar por nombre o código..." id="inv-search"
+                            oninput="Inv.applyFilter()">
+                    </div>
+                    <div class="filter-select-wrap">
+                        <i class="fas fa-filter"></i>
+                        <select id="inv-filter" onchange="Inv.applyFilter()">
+                            <option value="all">Todos</option>
+                            <option value="low">Stock Bajo</option>
+                            <option value="ok">Stock Normal</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- TABLE -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <i class="fas fa-list" style="color:var(--accent);"></i>
+                        <h3>Productos en Inventario</h3>
+                        <span class="table-count" id="inv-count">0 productos</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Stock Actual</th>
+                                    <th>Stock Mín.</th>
+                                    <th>Precio</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inv-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: AGREGAR / EDITAR PRODUCTO -->
+    <div class="modal-overlay" id="modal-prod">
+        <div class="modal">
+            <div class="modal-hdr">
+                <h2 id="modal-prod-title">Agregar Producto</h2>
+                <button class="modal-close" onclick="Inv.closeModal('modal-prod')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-codigo-orig">
+                <div class="fm-row">
+                    <div class="fm-group">
+                        <label for="fm-codigo">Código *</label>
+                        <input type="text" id="fm-codigo" class="fm-input" placeholder="Ej: HAM-010">
+                    </div>
+                    <div class="fm-group">
+                        <label for="fm-categoria">Categoría</label>
+                        <input type="text" id="fm-categoria" class="fm-input" placeholder="Ej: Comida Rápida">
+                    </div>
+                </div>
+                <div class="fm-group">
+                    <label for="fm-nombre">Nombre del Producto *</label>
+                    <input type="text" id="fm-nombre" class="fm-input" placeholder="Nombre completo del producto">
+                </div>
+                <div class="fm-row">
+                    <div class="fm-group">
+                        <label for="fm-stock">Stock Inicial</label>
+                        <input type="number" id="fm-stock" class="fm-input" placeholder="0" min="0">
+                    </div>
+                    <div class="fm-group">
+                        <label for="fm-stock-min">Stock Mínimo</label>
+                        <input type="number" id="fm-stock-min" class="fm-input" placeholder="5" min="0">
+                    </div>
+                </div>
+                <div class="fm-group">
+                    <label for="fm-precio">Precio (COP)</label>
+                    <input type="number" id="fm-precio" class="fm-input" placeholder="0" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-cancel" onclick="Inv.closeModal('modal-prod')">Cancelar</button>
+                <button class="btn-modal-save" onclick="Inv.saveProduct()">
+                    <i class="fas fa-save"></i> Guardar Producto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AJUSTAR STOCK -->
+    <div class="modal-overlay" id="modal-ajuste">
+        <div class="modal" style="max-width:420px;">
+            <div class="modal-hdr">
+                <h2>Ajustar Stock</h2>
+                <button class="modal-close" onclick="Inv.closeModal('modal-ajuste')"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="fm-group">
+                    <label>Producto</label>
+                    <div id="ajuste-prod-name"
+                        style="padding:10px 12px;background:var(--bg);border-radius:var(--r);font-weight:700;font-size:.9rem;">
+                    </div>
+                </div>
+                <div class="fm-group">
+                    <label>Stock Actual</label>
+                    <div id="ajuste-stock-actual"
+                        style="padding:10px 12px;background:var(--bg);border-radius:var(--r);font-weight:800;font-size:1.125rem;color:var(--primary);">
+                    </div>
+                </div>
+                <input type="hidden" id="ajuste-codigo">
+                <div class="fm-row">
+                    <div class="fm-group">
+                        <label for="ajuste-tipo">Tipo de Movimiento</label>
+                        <select id="ajuste-tipo" class="fm-input">
+                            <option value="entrada">📥 Entrada</option>
+                            <option value="salida">📤 Salida</option>
+                        </select>
+                    </div>
+                    <div class="fm-group">
+                        <label for="ajuste-cant">Cantidad</label>
+                        <input type="number" id="ajuste-cant" class="fm-input" placeholder="0" min="1">
+                    </div>
+                </div>
+                <div class="fm-group">
+                    <label for="ajuste-motivo">Motivo (opcional)</label>
+                    <input type="text" id="ajuste-motivo" class="fm-input"
+                        placeholder="Ej: Compra proveedor, merma, etc.">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-cancel" onclick="Inv.closeModal('modal-ajuste')">Cancelar</button>
+                <button class="btn-modal-save" onclick="Inv.applyAjuste()">
+                    <i class="fas fa-arrows-up-down"></i> Aplicar Ajuste
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/sucursal-core.js"></script>
+    <script>
+        const Inv = {
+            session: null,
+            sucId: null,
+            inventario: [],
+            filtered: [],
+
+            init() {
+                this.session = SucursalAuth.requireAuth();
+                if (!this.session) return;
+                this.sucId = this.session.id;
+                renderSidebarHeader(this.session, 'inventario');
+                this.refresh();
+            },
+
+            refresh() {
+                this.inventario = SucursalData.getInventario(this.sucId);
+                this.applyFilter();
+                this.updateStats();
+            },
+
+            applyFilter() {
+                const q = (document.getElementById('inv-search')?.value || '').toLowerCase();
+                const f = document.getElementById('inv-filter')?.value || 'all';
+                this.filtered = this.inventario.filter(p => {
+                    const matchQ = !q || p.nombre.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q);
+                    const isLow = p.stock <= p.stockMin;
+                    const matchF = f === 'all' || (f === 'low' && isLow) || (f === 'ok' && !isLow);
+                    return matchQ && matchF;
+                });
+                this.renderTable();
+            },
+
+            updateStats() {
+                const total = this.inventario.length;
+                const bajo = this.inventario.filter(p => p.stock <= p.stockMin).length;
+                const ok = total - bajo;
+                const valor = this.inventario.reduce((s, p) => s + p.precio * p.stock, 0);
+                document.getElementById('s-total').textContent = total;
+                document.getElementById('s-ok').textContent = ok;
+                document.getElementById('s-bajo').textContent = bajo;
+                document.getElementById('s-valor').textContent = Utils.fmtCurrency(valor);
+            },
+
+            renderTable() {
+                const tbody = document.getElementById('inv-tbody');
+                const count = document.getElementById('inv-count');
+                count.textContent = `${this.filtered.length} productos`;
+
+                if (!this.filtered.length) {
+                    tbody.innerHTML = `<tr class="empty-row"><td colspan="8"><i class="fas fa-boxes-stacked"></i>Sin productos en este filtro</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = this.filtered.map(p => {
+                    const isLow = p.stock > 0 && p.stock <= p.stockMin;
+                    const isZero = p.stock === 0;
+                    const pct = p.stockMin ? Math.min(100, Math.round((p.stock / (p.stockMin * 2)) * 100)) : 100;
+                    const barColor = isZero ? '#9CA3AF' : isLow ? '#EF4444' : '#10B981';
+                    const badgeClass = isZero ? 'badge-zero' : isLow ? 'badge-low' : 'badge-ok';
+                    const badgeLabel = isZero ? 'Sin Stock' : isLow ? '⚠ Stock Bajo' : 'Normal';
+                    const rowClass = (isLow || isZero) ? 'low-row' : '';
+
+                    return `
+            <tr class="${rowClass}">
+                <td><code style="font-size:.75rem;color:var(--primary);background:#EEF2FF;padding:2px 8px;border-radius:6px;">${p.codigo}</code></td>
+                <td><strong style="color:var(--text1);">${p.nombre}</strong></td>
+                <td><span style="font-size:.75rem;color:var(--text3);">${p.categoria || '—'}</span></td>
+                <td>
+                    <div class="stock-bar-wrap">
+                        <div class="stock-bar-track">
+                            <div class="stock-bar" style="width:${pct}%;background:${barColor};"></div>
+                        </div>
+                        <strong style="color:${barColor};min-width:28px;text-align:right;">${p.stock}</strong>
+                    </div>
+                </td>
+                <td style="color:var(--text3);">${p.stockMin}</td>
+                <td><strong style="color:var(--primary);">${Utils.fmtCurrency(p.precio)}</strong></td>
+                <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
+                <td>
+                    <div class="act-btns">
+                        <button class="btn-act adjust" onclick="Inv.openAjuste('${p.codigo}')">
+                            <i class="fas fa-arrows-up-down"></i> Ajustar
+                        </button>
+                        <button class="btn-act edit" onclick="Inv.openEditModal('${p.codigo}')">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="btn-act del" onclick="Inv.deleteProduct('${p.codigo}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+                }).join('');
+            },
+
+            openAddModal() {
+                document.getElementById('modal-prod-title').textContent = 'Agregar Producto';
+                document.getElementById('edit-codigo-orig').value = '';
+                ['fm-codigo', 'fm-nombre', 'fm-categoria', 'fm-motivo'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+                ['fm-stock', 'fm-stock-min', 'fm-precio'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+                document.getElementById('modal-prod').classList.add('open');
+            },
+
+            openEditModal(codigo) {
+                const p = this.inventario.find(x => x.codigo === codigo);
+                if (!p) return;
+                document.getElementById('modal-prod-title').textContent = 'Editar Producto';
+                document.getElementById('edit-codigo-orig').value = codigo;
+                document.getElementById('fm-codigo').value = p.codigo;
+                document.getElementById('fm-nombre').value = p.nombre;
+                document.getElementById('fm-categoria').value = p.categoria || '';
+                document.getElementById('fm-stock').value = p.stock;
+                document.getElementById('fm-stock-min').value = p.stockMin;
+                document.getElementById('fm-precio').value = p.precio;
+                document.getElementById('modal-prod').classList.add('open');
+            },
+
+            saveProduct() {
+                const codigo = document.getElementById('fm-codigo').value.trim();
+                const nombre = document.getElementById('fm-nombre').value.trim();
+                const categoria = document.getElementById('fm-categoria').value.trim();
+                const stock = parseInt(document.getElementById('fm-stock').value) || 0;
+                const stockMin = parseInt(document.getElementById('fm-stock-min').value) || 0;
+                const precio = parseFloat(document.getElementById('fm-precio').value) || 0;
+                const editOrig = document.getElementById('edit-codigo-orig').value;
+
+                if (!codigo || !nombre) {
+                    Swal.fire({ icon: 'warning', title: 'Campos requeridos', text: 'El código y el nombre son obligatorios.', confirmButtonColor: '#0B132B' });
+                    return;
+                }
+
+                if (editOrig) {
+                    // Editar: si cambió el código, verificar que no exista
+                    if (codigo !== editOrig && this.inventario.find(p => p.codigo === codigo)) {
+                        Swal.fire({ icon: 'error', title: 'Código duplicado', text: 'Ya existe un producto con ese código.', confirmButtonColor: '#0B132B' });
+                        return;
+                    }
+                    SucursalData.updateProducto(this.sucId, editOrig, { codigo, nombre, categoria, stock, stockMin, precio });
+                } else {
+                    const ok = SucursalData.addProducto(this.sucId, { codigo, nombre, categoria, stock, stockMin, precio });
+                    if (!ok) {
+                        Swal.fire({ icon: 'error', title: 'Código duplicado', text: 'Ya existe un producto con ese código.', confirmButtonColor: '#0B132B' });
+                        return;
+                    }
+                }
+
+                this.closeModal('modal-prod');
+                this.refresh();
+                Swal.fire({ icon: 'success', title: editOrig ? 'Producto actualizado' : 'Producto agregado', timer: 1400, showConfirmButton: false });
+            },
+
+            deleteProduct(codigo) {
+                const p = this.inventario.find(x => x.codigo === codigo);
+                if (!p) return;
+                Swal.fire({
+                    title: `¿Eliminar "${p.nombre}"?`,
+                    text: 'Esta acción no se puede deshacer. El producto se eliminará del inventario.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#EF4444',
+                    cancelButtonColor: '#6B7280',
+                    reverseButtons: true
+                }).then(r => {
+                    if (r.isConfirmed) {
+                        SucursalData.deleteProducto(this.sucId, codigo);
+                        this.refresh();
+                        Swal.fire({ icon: 'success', title: 'Producto eliminado', timer: 1200, showConfirmButton: false });
+                    }
+                });
+            },
+
+            openAjuste(codigo) {
+                const p = this.inventario.find(x => x.codigo === codigo);
+                if (!p) return;
+                document.getElementById('ajuste-codigo').value = codigo;
+                document.getElementById('ajuste-prod-name').textContent = p.nombre;
+                document.getElementById('ajuste-stock-actual').textContent = `${p.stock} unidades`;
+                document.getElementById('ajuste-tipo').value = 'entrada';
+                document.getElementById('ajuste-cant').value = '';
+                document.getElementById('ajuste-motivo').value = '';
+                document.getElementById('modal-ajuste').classList.add('open');
+            },
+
+            applyAjuste() {
+                const codigo = document.getElementById('ajuste-codigo').value;
+                const tipo = document.getElementById('ajuste-tipo').value;
+                const cant = parseInt(document.getElementById('ajuste-cant').value) || 0;
+                const motivo = document.getElementById('ajuste-motivo').value.trim();
+
+                if (cant <= 0) {
+                    Swal.fire({ icon: 'warning', title: 'Cantidad inválida', text: 'La cantidad debe ser mayor a 0.', confirmButtonColor: '#0B132B' });
+                    return;
+                }
+
+                const ok = SucursalData.ajustarStock(this.sucId, codigo, tipo, cant, motivo);
+                if (!ok) {
+                    Swal.fire({ icon: 'error', title: 'Stock insuficiente', text: 'No hay suficiente stock para realizar la salida.', confirmButtonColor: '#0B132B' });
+                    return;
+                }
+
+                this.closeModal('modal-ajuste');
+                this.refresh();
+                const p = this.inventario.find(x => x.codigo === codigo);
+                Swal.fire({ icon: 'success', title: 'Stock ajustado', text: `${tipo === 'entrada' ? '+' : '-'}${cant} unidades aplicado correctamente.`, timer: 1600, showConfirmButton: false });
+            },
+
+            closeModal(id) {
+                document.getElementById(id).classList.remove('open');
+            }
+        };
+
+        function doLogout() {
+            Swal.fire({
+                title: '¿Cerrar Sesión?', text: '¿Seguro que deseas cerrar sesión?', icon: 'warning',
+                showCancelButton: true, confirmButtonText: 'Cerrar Sesión', cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#EF4444', cancelButtonColor: '#6B7280', reverseButtons: true
+            }).then(r => { if (r.isConfirmed) SucursalAuth.logout(); });
+        }
+
+        // ========================================
+        // SISTEMA DE NOTIFICACIONES TOAST
+        // ========================================
+        const Toast = {
+            container: null,
+
+            init() {
+                this.container = document.getElementById('toast-container');
+            },
+
+            show(options = {}) {
+                if (!this.container) this.init();
+
+                const {
+                    type = 'info',
+                    title = '',
+                    message = '',
+                    duration = 4000,
+                    icon = true
+                } = options;
+
+                const icons = {
+                    success: 'fa-check',
+                    error: 'fa-times',
+                    warning: 'fa-exclamation',
+                    info: 'fa-info'
+                };
+
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    ${icon ? `<div class="toast-icon"><i class="fas ${icons[type]}"></i></div>` : ''}
+                    <div class="toast-content">
+                        ${title ? `<div class="toast-title">${title}</div>` : ''}
+                        ${message ? `<div class="toast-message">${message}</div>` : ''}
+                    </div>
+                    <button class="toast-close" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+                `;
+
+                this.container.appendChild(toast);
+
+                // Animación de entrada
+                requestAnimationFrame(() => {
+                    toast.classList.add('show');
+                });
+
+                // Cerrar con el botón
+                const closeBtn = toast.querySelector('.toast-close');
+                closeBtn.addEventListener('click', () => this.remove(toast));
+
+                // Auto-cerrar
+                if (duration > 0) {
+                    setTimeout(() => this.remove(toast), duration);
+                }
+
+                return toast;
+            },
+
+            remove(toast) {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            },
+
+            success(message, title = '¡Éxito!') {
+                return this.show({ type: 'success', title, message });
+            },
+
+            error(message, title = 'Error') {
+                return this.show({ type: 'error', title, message });
+            },
+
+            warning(message, title = 'Advertencia') {
+                return this.show({ type: 'warning', title, message });
+            },
+
+            info(message, title = 'Información') {
+                return this.show({ type: 'info', title, message });
+            }
+        };
+
+        // Inicializar Toast al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            Toast.init();
+            Inv.init();
+        });
+    </script>
+</body>
+
+</html>

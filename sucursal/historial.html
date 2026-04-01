@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Ventas | Anthony Chef</title>
+    <meta name="description" content="Historial de ventas — Anthony Chef Panel de Sucursal">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --sidebar: #0B132B;
+            --sidebar-active: rgba(59,130,246,0.18);
+            --bg: #F0F4FF;
+            --card: #FFFFFF;
+            --primary: #0B132B;
+            --primary-hover: #1A2542;
+            --accent: #3B82F6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --border: #E8EDF5;
+            --border2: #D1D9E6;
+            --text1: #1A1F36;
+            --text2: #5A6E8A;
+            --text3: #8898AA;
+            --shadow: 0 2px 8px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --r: 12px;
+            --sidebar-w: 260px;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text1); -webkit-font-smoothing: antialiased; }
+
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-w); background: var(--sidebar); position: fixed; left: 0; top: 0; height: 100vh; display: flex; flex-direction: column; z-index: 100; box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
+        .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; gap: 12px; }
+        .sidebar-logo img { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; }
+        .sidebar-logo-text .name { font-size: 1rem; font-weight: 800; color: #fff; }
+        .sidebar-logo-text .tagline { font-size: 0.6875rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.07em; }
+        .sidebar-branch { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-branch .label { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); font-weight: 700; margin-bottom: 4px; }
+        .sidebar-branch .suc-branch-name { font-size: 0.875rem; font-weight: 700; color: #fff; }
+        .sidebar-branch .suc-encargado { font-size: 0.75rem; color: rgba(255,255,255,0.45); }
+        .sidebar-nav-label { padding: 16px 20px 6px; font-size: 0.625rem; font-weight: 700; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.1em; }
+        nav#suc-nav { flex: 1; padding: 4px 0; }
+        .suc-nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.875rem; font-weight: 500; border-left: 3px solid transparent; }
+        .suc-nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .suc-nav-item.active { background: var(--sidebar-active); color: #fff; border-left-color: var(--accent); }
+        .suc-nav-item i { width: 18px; text-align: center; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.07); }
+        .btn-logout-suc { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); border-radius: var(--r); color: #FC8181; font-size: 0.8125rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .btn-logout-suc:hover { background: rgba(239,68,68,0.22); }
+
+        /* LAYOUT */
+        .main-wrap { margin-left: var(--sidebar-w); min-height: 100vh; }
+        .page-header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 32px; height: 68px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 50; }
+        .page-header h1 { font-size: 1.125rem; font-weight: 800; color: var(--text1); letter-spacing: -0.02em; }
+        .page-header p { font-size: 0.75rem; color: var(--text2); font-weight: 500; }
+
+        .content { padding: 24px 32px 40px; }
+
+        /* RESUMEN KPIs */
+        .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+        .kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .kpi-card:nth-child(1)::before { background: linear-gradient(90deg, #10B981, #059669); }
+        .kpi-card:nth-child(2)::before { background: linear-gradient(90deg, #3B82F6, #2D3A6B); }
+        .kpi-card:nth-child(3)::before { background: linear-gradient(90deg, #F59E0B, #D97706); }
+        .kpi-icon { width: 40px; height: 40px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: white; margin-bottom: 10px; }
+        .kpi-icon.green { background: linear-gradient(135deg, #10B981, #059669); }
+        .kpi-icon.blue  { background: linear-gradient(135deg, #3B82F6, #2D3A6B); }
+        .kpi-icon.orange { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .kpi-value { font-size: 1.375rem; font-weight: 800; color: var(--text1); letter-spacing: -0.02em; }
+        .kpi-label { font-size: 0.75rem; color: var(--text3); font-weight: 600; margin-top: 2px; }
+
+        /* FILTERS */
+        .filters-bar { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .filter-group { display: flex; gap: 6px; align-items: center; }
+        .filter-btn { padding: 7px 14px; border: 1.5px solid var(--border2); border-radius: 9999px; font-size: 0.8125rem; font-weight: 600; color: var(--text2); background: white; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .filter-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .filter-sep { width: 1px; height: 28px; background: var(--border); }
+        .date-inputs { display: flex; align-items: center; gap: 8px; }
+        .date-input { padding: 7px 12px; border: 1.5px solid var(--border2); border-radius: var(--r); font-size: 0.8125rem; color: var(--text1); font-family: 'Inter', sans-serif; outline: none; }
+        .date-input:focus { border-color: var(--accent); }
+
+        .btn-export { margin-left: auto; display: flex; align-items: center; gap: 7px; padding: 9px 16px; background: white; border: 1.5px solid var(--border2); border-radius: var(--r); font-size: 0.8125rem; font-weight: 700; color: var(--text2); cursor: pointer; font-family: 'Inter', sans-serif; }
+        .btn-export:hover { border-color: var(--success); color: var(--success); }
+
+        /* TABLE CARD */
+        .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow-md); overflow: hidden; }
+        .table-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+        .table-header h3 { font-size: 0.9375rem; font-weight: 700; color: var(--text1); }
+        .table-count { margin-left: auto; font-size: 0.75rem; font-weight: 600; color: var(--text3); }
+        .table-wrapper { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { padding: 11px 16px; font-size: 0.6875rem; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; background: #F8FAFF; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        .data-table td { padding: 14px 16px; font-size: 0.8125rem; color: var(--text2); border-bottom: 1px solid var(--border); }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: #FAFCFF; }
+
+        .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 9999px; font-size: 0.6875rem; font-weight: 700; }
+        .badge-success { background: #D1FAE5; color: #065F46; }
+        .badge-warning { background: #FEF3C7; color: #92400E; }
+        .badge-danger  { background: #FEE2E2; color: #991B1B; }
+
+        .btn-ver { width: 30px; height: 30px; background: var(--bg); border: 1.5px solid var(--border2); border-radius: var(--r); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text3); font-size: .8125rem; }
+        .btn-ver:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .empty-row td { text-align: center; padding: 48px 16px; color: var(--text3); }
+        .empty-row i { font-size: 2rem; display: block; margin-bottom: 10px; opacity: .3; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) { .sidebar { width: 0; overflow: hidden; } .main-wrap { margin-left: 0; } .kpi-row { grid-template-columns: 1fr 1fr; } .content { padding: 16px; } }
+        @media (max-width: 600px) { .kpi-row { grid-template-columns: 1fr; } .filters-bar { flex-direction: column; align-items: flex-start; } }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <img src="../assets/logo.png" alt="Anthony Chef">
+        <div class="sidebar-logo-text">
+            <div class="name">Anthony Chef</div>
+            <div class="tagline">Panel Sucursal</div>
+        </div>
+    </div>
+
+    <div class="sidebar-branch">
+        <div class="label">Sucursal activa</div>
+        <div class="suc-branch-name">Cargando...</div>
+        <div class="suc-encargado">—</div>
+    </div>
+
+    <div class="sidebar-nav-label">Módulos</div>
+    <nav id="suc-nav"></nav>
+
+    <div class="sidebar-footer">
+        <button class="btn-logout-suc" onclick="doLogout()">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
+    </div>
+</div>
+
+<div class="main-wrap">
+    <header class="page-header">
+        <div>
+            <h1><i class="fas fa-clock-rotate-left" style="color:var(--accent);margin-right:8px;"></i>Historial de Ventas</h1>
+            <p class="suc-branch-name">Cargando sucursal...</p>
+        </div>
+    </header>
+
+    <main class="content">
+        <!-- KPIs -->
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-icon green"><i class="fas fa-dollar-sign"></i></div>
+                <div class="kpi-value" id="k-total">$0</div>
+                <div class="kpi-label">Total Ventas del Período</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon blue"><i class="fas fa-receipt"></i></div>
+                <div class="kpi-value" id="k-transacciones">0</div>
+                <div class="kpi-label">Transacciones</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon orange"><i class="fas fa-chart-line"></i></div>
+                <div class="kpi-value" id="k-promedio">$0</div>
+                <div class="kpi-label">Promedio por Venta</div>
+            </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <button class="filter-btn active" data-period="today" onclick="Historial.setPeriod('today')">Hoy</button>
+                <button class="filter-btn" data-period="week"  onclick="Historial.setPeriod('week')">Esta semana</button>
+                <button class="filter-btn" data-period="month" onclick="Historial.setPeriod('month')">Este mes</button>
+                <button class="filter-btn" data-period="custom" onclick="Historial.setPeriod('custom')">Personalizado</button>
+            </div>
+
+            <div class="filter-sep"></div>
+
+            <div class="date-inputs" id="custom-dates" style="display:none;">
+                <input type="date" id="date-start" class="date-input" onchange="Historial.applyCustom()">
+                <span style="color:var(--text3);font-size:.875rem;">—</span>
+                <input type="date" id="date-end" class="date-input" onchange="Historial.applyCustom()">
+            </div>
+
+            <button class="btn-export" onclick="exportarReporte()">
+                <i class="fas fa-file-export"></i> Exportar Reporte
+            </button>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-card">
+            <div class="table-header">
+                <i class="fas fa-list-ul" style="color:var(--accent);"></i>
+                <h3>Registro de Ventas</h3>
+                <span class="table-count" id="table-count">0 registros</span>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID Venta</th>
+                            <th>Fecha y Hora</th>
+                            <th>Cliente</th>
+                            <th>Productos</th>
+                            <th>Total</th>
+                            <th>Pago</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="ventas-tbody">
+                        <tr class="empty-row"><td colspan="8"><i class="fas fa-receipt"></i>Sin ventas registradas en este período</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="../assets/js/sucursal-core.js"></script>
+<script>
+const Historial = {
+    session: null,
+    sucId: null,
+    ventas: [],
+    filtered: [],
+    period: 'today',
+
+    init() {
+        this.session = SucursalAuth.requireAuth();
+        if (!this.session) return;
+        this.sucId = this.session.id;
+        renderSidebarHeader(this.session, 'historial');
+        this.ventas = SucursalData.getVentas(this.sucId);
+        this.setPeriod('today');
+    },
+
+    setPeriod(p) {
+        this.period = p;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.period === p));
+        document.getElementById('custom-dates').style.display = p === 'custom' ? 'flex' : 'none';
+        if (p !== 'custom') this.applyFilter();
+    },
+
+    applyCustom() {
+        if (this.period === 'custom') this.applyFilter();
+    },
+
+    applyFilter() {
+        const today = Utils.today();
+        const p = this.period;
+
+        if (p === 'today') {
+            this.filtered = this.ventas.filter(v => Utils.isToday(v.fecha));
+        } else if (p === 'week') {
+            this.filtered = this.ventas.filter(v => Utils.isThisWeek(v.fecha));
+        } else if (p === 'month') {
+            this.filtered = this.ventas.filter(v => Utils.isThisMonth(v.fecha));
+        } else if (p === 'custom') {
+            const start = document.getElementById('date-start').value;
+            const end   = document.getElementById('date-end').value;
+            this.filtered = this.ventas.filter(v => {
+                const d = v.fecha.split('T')[0];
+                return (!start || d >= start) && (!end || d <= end);
+            });
+        }
+
+        this.renderKPIs();
+        this.renderTable();
+    },
+
+    renderKPIs() {
+        const total = this.filtered.reduce((s, v) => s + v.total, 0);
+        const n = this.filtered.length;
+        document.getElementById('k-total').textContent = Utils.fmtCurrency(total);
+        document.getElementById('k-transacciones').textContent = n.toLocaleString('es-CO');
+        document.getElementById('k-promedio').textContent = n ? Utils.fmtCurrency(Math.round(total / n)) : '$0';
+    },
+
+    renderTable() {
+        const tbody = document.getElementById('ventas-tbody');
+        const count = document.getElementById('table-count');
+        count.textContent = `${this.filtered.length} registros`;
+
+        if (!this.filtered.length) {
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="8"><i class="fas fa-receipt"></i>Sin ventas registradas en este período</td></tr>`;
+            return;
+        }
+
+        const pagoLabel = { efectivo: '💵 Efectivo', tarjeta: '💳 Tarjeta', transferencia: '🏦 Transferencia' };
+
+        tbody.innerHTML = this.filtered.map(v => {
+            const prods = v.items.map(i => `${i.nombre} x${i.cantidad}`).join(', ');
+            const prodsShort = prods.length > 40 ? prods.substring(0, 40) + '…' : prods;
+            return `
+            <tr>
+                <td><strong style="color:var(--text1);font-family:monospace;">${v.id}</strong></td>
+                <td>${Utils.fmtDate(v.fecha)}</td>
+                <td>${v.cliente}</td>
+                <td title="${prods}" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${prodsShort}</td>
+                <td><strong style="color:var(--success);">${Utils.fmtCurrency(v.total)}</strong></td>
+                <td>${pagoLabel[v.metodoPago] || v.metodoPago}</td>
+                <td><span class="badge badge-success">Completado</span></td>
+                <td>
+                    <button class="btn-ver" onclick="Historial.verDetalle('${v.id}')" title="Ver detalle">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+    },
+
+    verDetalle(id) {
+        const v = this.ventas.find(x => x.id === id);
+        if (!v) return;
+        const pagoLabel = { efectivo: '💵 Efectivo', tarjeta: '💳 Tarjeta', transferencia: '🏦 Transferencia' };
+        Swal.fire({
+            title: `<span style="font-size:1rem;font-weight:800;">Venta ${v.id}</span>`,
+            html: `
+                <div style="text-align:left;display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+                    <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#F8FAFF;border-radius:10px;">
+                        <span style="color:#8898AA;font-size:.8rem;">Fecha</span>
+                        <span style="font-weight:600;font-size:.875rem;">${Utils.fmtDate(v.fecha)}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#F8FAFF;border-radius:10px;">
+                        <span style="color:#8898AA;font-size:.8rem;">Cliente</span>
+                        <span style="font-weight:600;font-size:.875rem;">${v.cliente}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#F8FAFF;border-radius:10px;">
+                        <span style="color:#8898AA;font-size:.8rem;">Método de pago</span>
+                        <span style="font-weight:600;font-size:.875rem;">${pagoLabel[v.metodoPago] || v.metodoPago}</span>
+                    </div>
+                    <div style="padding:10px 14px;background:#F8FAFF;border-radius:10px;">
+                        <div style="color:#8898AA;font-size:.8rem;margin-bottom:6px;">Productos</div>
+                        ${v.items.map(i => `
+                        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #E8EDF5;">
+                            <span style="font-size:.8125rem;font-weight:600;">${i.nombre} <span style="color:#8898AA;">x${i.cantidad}</span></span>
+                            <span style="font-size:.8125rem;font-weight:700;color:#10B981;">${Utils.fmtCurrency(i.subtotal)}</span>
+                        </div>`).join('')}
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:12px 16px;background:#0B132B;border-radius:10px;">
+                        <span style="color:rgba(255,255,255,.6);font-weight:700;font-size:.875rem;">TOTAL</span>
+                        <span style="color:white;font-weight:800;font-size:1.125rem;">${Utils.fmtCurrency(v.total)}</span>
+                    </div>
+                </div>
+            `,
+            confirmButtonText: 'Cerrar',
+            confirmButtonColor: '#0B132B',
+            width: '440px'
+        });
+    }
+};
+
+function doLogout() {
+    Swal.fire({
+        title: '¿Cerrar Sesión?', text: '¿Seguro que deseas cerrar sesión?', icon: 'warning',
+        showCancelButton: true, confirmButtonText: 'Cerrar Sesión', cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#EF4444', cancelButtonColor: '#6B7280', reverseButtons: true
+    }).then(r => { if (r.isConfirmed) SucursalAuth.logout(); });
+}
+
+function exportarReporte() {
+    Swal.fire({ icon: 'info', title: 'Exportar Reporte', text: 'Funcionalidad en desarrollo. Próximamente podrás exportar a PDF y Excel.', confirmButtonColor: '#0B132B' });
+}
+
+document.addEventListener('DOMContentLoaded', () => Historial.init());
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+/*
+ * ANTHONY CHEF — GLOBAL MODALS CSS
+ * Estilos para los modales de Perfil y Configuración
+ * Incluir en todas las páginas del panel administrativo
+ */
+
+/* ══════════════════════════════════════════
+   OVERLAY BASE
+══════════════════════════════════════════ */
+.ac-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(11,19,43,0.58);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.22s ease;
+}
+.ac-modal-overlay.open {
+    opacity: 1; pointer-events: all;
+}
+
+/* ══════════════════════════════════════════
+   MODAL CARD
+══════════════════════════════════════════ */
+.ac-modal {
+    background: #ffffff;
+    border-radius: 20px;
+    width: 100%; max-width: 460px;
+    box-shadow: 0 24px 64px rgba(11,19,43,0.24), 0 0 0 1px rgba(255,255,255,0.08);
+    overflow: hidden;
+    transform: translateY(24px) scale(0.96);
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+}
+.ac-modal-overlay.open .ac-modal {
+    transform: translateY(0) scale(1);
+}
+.ac-modal--wide { max-width: 540px; }
+
+/* ══════════════════════════════════════════
+   MODAL HEADER (banner gradient)
+══════════════════════════════════════════ */
+.ac-modal-header {
+    position: relative;
+    height: 90px;
+    background: linear-gradient(135deg, #0B132B 0%, #2C3E66 100%);
+    display: flex; align-items: flex-end; justify-content: center;
+    overflow: visible;
+}
+.ac-modal-header--settings {
+    align-items: center;
+}
+.ac-modal-header-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 70% 0%, rgba(59,130,246,0.28) 0%, transparent 60%);
+    pointer-events: none;
+}
+.ac-modal-close {
+    position: absolute; top: 12px; right: 14px;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,0.13); border: none;
+    color: rgba(255,255,255,0.75); cursor: pointer; font-size: 0.8125rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    z-index: 2;
+}
+.ac-modal-close:hover { background: rgba(239,68,68,0.65); color: white; }
+
+/* ══════════════════════════════════════════
+   PROFILE — avatar bubble (overflows header)
+══════════════════════════════════════════ */
+.pm-avatar-wrap {
+    position: absolute; bottom: -28px;
+    z-index: 1;
+}
+.pm-avatar {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: linear-gradient(135deg, #B8860B, #DAA520, #FFD700);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.375rem; font-weight: 800; color: white;
+    border: 3px solid white;
+    box-shadow: 0 6px 22px rgba(184,134,11,0.42);
+}
+
+/* ══════════════════════════════════════════
+   SETTINGS — header cog icon
+══════════════════════════════════════════ */
+.sm-header-icon {
+    width: 54px; height: 54px; border-radius: 16px;
+    background: rgba(59,130,246,0.18);
+    border: 1.5px solid rgba(59,130,246,0.38);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.375rem; color: #93C5FD;
+    position: relative; z-index: 1;
+}
+
+/* ══════════════════════════════════════════
+   MODAL BODY
+══════════════════════════════════════════ */
+.ac-modal-body {
+    padding: 44px 28px 28px;
+}
+.ac-modal-header--settings + .ac-modal-body { padding-top: 22px; }
+.ac-modal--wide .ac-modal-body { padding-top: 22px; }
+
+.pm-role-row { text-align: center; margin-bottom: 6px; }
+.pm-role-badge {
+    display: inline-block; padding: 3px 12px;
+    background: #FEF3C7; color: #92400E;
+    border-radius: 9999px; font-size: 0.6875rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+}
+.ac-modal-title {
+    font-size: 1.25rem; font-weight: 800;
+    color: #1A1F36;
+    text-align: center; margin-bottom: 2px;
+}
+.ac-modal-sub {
+    font-size: 0.8125rem; color: #8898AA;
+    text-align: center; margin-bottom: 22px;
+}
+
+/* ══════════════════════════════════════════
+   PROFILE FORM
+══════════════════════════════════════════ */
+.pm-form { display: flex; flex-direction: column; gap: 14px; }
+.pm-field { display: flex; flex-direction: column; gap: 5px; }
+.pm-field label {
+    font-size: 0.75rem; font-weight: 600; color: #5A6E8A;
+    display: flex; align-items: center; gap: 6px;
+}
+.pm-field label i { color: #3B82F6; width: 14px; }
+.pm-optional { font-weight: 400; color: #8898AA; }
+.pm-field input {
+    padding: 10px 14px;
+    border: 1.5px solid #D1D9E6;
+    border-radius: 12px;
+    font-size: 0.875rem; font-family: 'Inter', sans-serif;
+    color: #1A1F36;
+    background: #F0F4FF;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+    width: 100%;
+}
+.pm-field input:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    background: #ffffff;
+}
+
+/* Feedback bar */
+.pm-feedback {
+    font-size: 0.8125rem; font-weight: 600;
+    padding: 8px 12px; border-radius: 8px;
+    text-align: center; transition: all 0.2s;
+}
+.pm-feedback:empty { padding: 0; }
+.pm-feedback--success { background: #D1FAE5; color: #065F46; }
+.pm-feedback--error   { background: #FEE2E2; color: #991B1B; }
+
+/* Save button */
+.pm-save-btn {
+    width: 100%; padding: 12px;
+    background: linear-gradient(135deg, #0B132B, #2C3E66);
+    color: white; border: none; border-radius: 12px;
+    font-size: 0.9375rem; font-weight: 700; cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 16px rgba(11,19,43,0.26);
+    transition: transform 0.18s, box-shadow 0.18s;
+    margin-top: 4px;
+}
+.pm-save-btn:hover { transform: translateY(-1px); box-shadow: 0 7px 22px rgba(11,19,43,0.34); }
+.pm-save-btn:active { transform: translateY(0); }
+
+/* ══════════════════════════════════════════
+   SETTINGS TABS
+══════════════════════════════════════════ */
+.sm-tabs {
+    display: flex; gap: 4px;
+    background: #F0F4FF;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 14px;
+}
+.sm-tab-btn {
+    flex: 1; padding: 9px 8px;
+    border: none; background: transparent;
+    border-radius: 8px;
+    font-size: 0.75rem; font-weight: 600;
+    color: #8898AA;
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+}
+.sm-tab-btn:hover { color: #1A1F36; }
+.sm-tab-btn.active {
+    background: white;
+    color: #1A1F36;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+}
+
+.sm-tab-panel { display: none; flex-direction: column; gap: 8px; }
+.sm-tab-panel.active { display: flex; }
+
+/* ══════════════════════════════════════════
+   SETTINGS ROWS
+══════════════════════════════════════════ */
+.sm-setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 16px;
+    background: #F0F4FF;
+    border: 1px solid #E8EDF5;
+    border-radius: 12px;
+    gap: 12px;
+}
+.sm-setting-info {
+    display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;
+}
+.sm-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9375rem; flex-shrink: 0;
+}
+.sm-icon--yellow { background: #FEF3C7; color: #D97706; }
+.sm-icon--blue   { background: #DBEAFE; color: #2563EB; }
+.sm-icon--green  { background: #D1FAE5; color: #059669; }
+.sm-icon--purple { background: #EDE9FE; color: #7C3AED; }
+.sm-setting-label { font-size: 0.875rem; font-weight: 600; color: #1A1F36; }
+.sm-setting-desc  { font-size: 0.6875rem; color: #8898AA; margin-top: 1px; }
+
+/* Toggle switch */
+.sm-toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.sm-toggle input { opacity: 0; width: 0; height: 0; }
+.sm-toggle-slider {
+    position: absolute; inset: 0;
+    background: #D1D9E6; border-radius: 9999px;
+    cursor: pointer; transition: background 0.2s;
+}
+.sm-toggle-slider::before {
+    content: '';
+    position: absolute; left: 3px; bottom: 3px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.22);
+    transition: transform 0.2s;
+}
+.sm-toggle input:checked + .sm-toggle-slider { background: #3B82F6; }
+.sm-toggle input:checked + .sm-toggle-slider::before { transform: translateX(18px); }
+
+.sm-select {
+    padding: 6px 10px;
+    border: 1.5px solid #D1D9E6; border-radius: 8px;
+    font-size: 0.75rem; font-weight: 600; color: #1A1F36;
+    background: white; cursor: pointer; outline: none;
+    font-family: 'Inter', sans-serif;
+}
+.sm-action-btn {
+    padding: 7px 14px;
+    border: 1.5px solid #D1D9E6; border-radius: 8px;
+    font-size: 0.75rem; font-weight: 600; color: #5A6E8A;
+    background: white; cursor: pointer; font-family: 'Inter', sans-serif;
+    transition: all 0.15s; flex-shrink: 0;
+}
+.sm-action-btn:hover { border-color: #3B82F6; color: #3B82F6; }
+.sm-action-btn--danger:hover { border-color: #EF4444; color: #EF4444; }
+
+.sm-theme-btns { display: flex; gap: 6px; }
+.sm-theme-btn {
+    width: 34px; height: 34px; border-radius: 8px;
+    border: 1.5px solid #D1D9E6; background: white;
+    color: #8898AA; cursor: pointer; font-size: 0.875rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+}
+.sm-theme-btn--active {
+    background: #0B132B; color: white; border-color: #0B132B;
+}
+.sm-theme-btn:hover:not(.sm-theme-btn--active) {
+    border-color: #3B82F6; color: #3B82F6;
+}
